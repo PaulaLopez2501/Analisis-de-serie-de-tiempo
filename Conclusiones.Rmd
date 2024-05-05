@@ -1,0 +1,80 @@
+# Conclusiones
+
+A lo largo de este análisis, hemos seguido varios pasos para trabajar
+con series temporales. Aquí están las conclusiones derivadas de nuestro
+análisis:
+
+## Preprocesamiento de datos
+
+-   **Carga y limpieza:** Se cargaron los datos, se verificaron valores
+    faltantes (NA), se aplicaron métodos para imputar datos faltantes si
+    era necesario, se selecciono una solo stock para todo el analisis.
+
+-   **Formateo de fechas:** Se aseguró que las fechas estuvieran en el
+    formato correcto y se organizó el dataset por fecha para garantizar
+    una secuencia temporal adecuada.
+
+-   **Visualización de la serie temporal:** Se realizaron gráficos para
+    visualizar el comportamiento de las variables, identificando
+    posibles tendencias y patrones.
+
+## Creacion de serie temporal
+
+-   **Frecuencia de la serie temporal**: se calculó la diferencia entre
+    fechas en la serie temporal. El análisis mostró que la mayoría de
+    los intervalos entre fechas era de 7 días, lo que sugiere una
+    frecuencia semanal. Este dato fue utilizado para establecer una
+    frecuencia de 52 semanas por año al crear la serie temporal.
+
+-   **Construcción de la serie temporal**: Con base en la frecuencia
+    identificada, se creó una serie temporal utilizando la columna
+    'close' y la fecha de inicio correspondiente. El resultado fue una
+    serie temporal con datos semanales, proporcionando la base para el
+    análisis posterior.
+
+## Estructura de datos en series temporales
+
+-   **Promedio móvil**: Se utilizó un promedio móvil simple con una
+    ventana de 3 períodos para suavizar las fluctuaciones a corto plazo
+    y revelar tendencias a largo plazo. El gráfico del promedio móvil
+    mostró cómo el suavizado ayuda a visualizar la tendencia en la serie
+    temporal, permitiendo identificar patrones generales.
+
+-   **Rezagos y correlación**: Se exploró el uso de rezagos para
+    identificar relaciones entre valores anteriores y actuales. La
+    correlación entre el precio actual y el rezago de 1 período fue de
+    0.8706391, indicando una fuerte relación positiva. Esto sugiere que
+    los valores anteriores tienen un impacto significativo en los
+    valores posteriores, lo cual puede ser útil para la predicción.
+
+-   **Estacionalidad y descomposición**: Se intentó usar la función
+    **`decompose`** para detectar estacionalidad, pero la serie temporal
+    era demasiado corta para un ciclo completo, lo que resultó en un
+    error. Esto implica que no fue posible identificar estacionalidad
+    con la serie temporal existente.
+
+-   **Estacionariedad y descomposicion, prueba de Dickey-Fuller:** Esta
+    prueba mostró que la serie temporal original no era estacionaria
+    (p-valor \> 0.05), lo que indica que había una tendencia o raíz
+    unitaria.
+
+-   **Diferenciación y transformación logarítmica:** Se aplicaron estas
+    técnicas para estabilizar la serie temporal y eliminar la tendencia.
+    Sin embargo, incluso después de estas transformaciones, la prueba de
+    Dickey-Fuller seguía mostrando no estacionariedad.
+
+## Análisis de modelo ARIMA
+
+-   **Identificación del mejor modelo ARIMA:** Se utilizó auto.arima()
+    para identificar el modelo ARIMA más adecuado para la serie
+    temporal. El resultado fue ARIMA(0,0,0) con media cero, un modelo de
+    ruido blanco.
+
+-   **Diagnóstico del modelo ARIMA:** El test de Ljung-Box mostró que
+    los residuos del modelo ARIMA(0,0,0) con media cero eran
+    consistentes con ruido blanco, lo que indica que no había
+    autocorrelaciones significativas.
+
+-   **Pronóstico con modelo ARIMA:** El pronóstico para 10 períodos
+    futuros con este modelo reflejó la naturaleza de ruido blanco de la
+    serie temporal, mostrando valores sin un patrón claro o predecible.

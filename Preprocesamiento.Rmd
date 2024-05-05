@@ -1,0 +1,159 @@
+# Preprocesamiento
+
+
+```{r, include=FALSE}
+#cargue del data set
+folder_path <- "C:/Users/e184385/OneDrive - WFT/Desktop/Msc/Semestre 2/Analisis de series de tiempo/DJI"
+file_path <- file.path(folder_path, "dow_jones_index.data")
+
+# Leer el archivo CSV
+my_data <- read.csv(file_path, header = TRUE, sep = ",")  # `sep` para indicar que es CSV
+
+# Convertir columnas de caracteres a numéricos
+numeric_columns <- c("open", "high", "low", "close", "next_weeks_open", "next_weeks_close")  # Las columnas que contienen precios
+
+# Remover el símbolo `$` y convertir a numérico
+for (col in numeric_columns) {
+  my_data[[col]] <- as.numeric(gsub("\\$", "", my_data[[col]]))
+}
+
+# Obtener la primera y ultima fecha de data frame
+first_date <- min(my_data$date, na.rm = TRUE)  # `na.rm = TRUE` para ignorar NA
+last_date <- max(my_data$date, na.rm = TRUE)
+print(first_date)  # Primera fecha
+print(last_date)   # Última fecha
+
+# Imputar valores faltantes con la media de la columna
+my_data$percent_change_volume_over_last_wk[is.na(my_data$percent_change_volume_over_last_wk)] <- 
+  mean(my_data$percent_change_volume_over_last_wk, na.rm = TRUE)
+
+# Imputar valores faltantes con la mediana de la columna
+my_data$previous_weeks_volume[is.na(my_data$previous_weeks_volume)] <- 
+  median(my_data$previous_weeks_volume, na.rm = TRUE)
+
+# Convertir la columna 'date' a formato Date
+my_data$date <- as.Date(my_data$date, format = "%m/%d/%Y")
+
+# ordenar por fecha
+my_data <- my_data[order(my_data$date), ] 
+
+# Crear un nuevo data frame con solo IBM
+data_ibm <- subset(my_data, stock == "IBM")
+
+# Verificar la diferencia entre fechas para determinar la frecuencia
+date_diff <- diff(data_ibm$date)  # Calcular la diferencia entre fechas
+
+# Verificar la distribución de los intervalos
+table(date_diff)
+
+# Promedio de la diferencia entre fechas
+mean(date_diff)  # Para ver el intervalo promedio
+
+# Crear una serie temporal a partir de 'close' y la fecha de inicio
+# Frecuencia de 52 semanas por año, para datos semanales
+ts_data <- ts(data_ibm$close, start = c(2011, 1), frequency = 52)
+
+# Verificar la serie temporal
+print(ts_data)
+
+# Graficar la serie temporal
+plot(ts_data, type = "l", main = "Serie Temporal del Precio de Cierre de IBM", 
+     xlab = "Tiempo", ylab = "Precio de Cierre")
+
+```
+
+
+
+## Estacionariedad
+
+Para determinar si la serie es estacionaria, se suelen usar pruebas
+estadísticas como la prueba de Dickey-Fuller aumentada (ADF, por sus
+siglas en inglés). Una serie es estacionaria si su media y varianza son
+constantes en el tiempo y no tiene tendencia. Para evaluar la
+estacionariedad:
+
+```{r}
+# Cargar el paquete tseries para la prueba ADF
+suppressPackageStartupMessages(library(tseries))
+
+# Realizar la prueba de Dickey-Fuller para evaluar la estacionariedad
+adf_result <- adf.test(ts_data)
+
+print(adf_result)
+
+```
+
+Los resultados de la prueba de Dickey-Fuller (ADF) indican que la serie
+temporal no es estacionaria, dado que el p-valor es 0.3409, que es mayor
+que el nivel de significancia típico de 0.05. Esto significa que no se
+puede rechazar la hipótesis nula de que la serie tiene una raíz
+unitaria, que es un indicio de no estacionariedad.
+
+Para abordar este problema y transformar la serie en una que sea
+estacionaria, se suelen emplear algunas técnicas como la diferenciación
+y las transformaciones logarítmicas.
+
+## Diferenciación
+
+La diferenciación es un método común para eliminar la tendencia y
+estabilizar la varianza en una serie temporal. Consiste en restar el
+valor anterior del valor actual, creando así una nueva serie que podría
+ser más estacionaria.
+
+```{r}
+# Diferenciar la serie temporal
+ts_data_diff <- diff(ts_data)
+
+# Realizar la prueba ADF en la serie diferenciada
+adf_result_diff <- adf.test(ts_data_diff)
+
+print(adf_result_diff)
+
+```
+
+El resultado de la prueba de Dickey-Fuller en la serie diferenciada
+muestra un p-valor de 0.5171, lo que indica que incluso después de la
+diferenciación, la serie sigue siendo no estacionaria. Esto implica que
+la serie temporal todavía tiene una raíz unitaria, y por lo tanto, no
+cumple con las condiciones de estacionariedad.
+
+Cuando la diferenciación simple no logra hacer que una serie temporal
+sea estacionaria,se puede emplear transformaciones.
+
+## Transformación
+
+as transformaciones logarítmicas pueden ayudar a estabilizar la varianza
+y reducir la tendencia en series temporales con crecimiento exponencial
+o gran variabilidad. Una combinación de transformación logarítmica y
+diferenciación puede ser eficaz.
+
+```{r}
+# Aplicar la transformación logarítmica
+ts_data_log <- log(ts_data)
+
+# Diferenciar la serie logarítmica
+ts_data_log_diff <- diff(ts_data_log)
+
+# Realizar la prueba ADF en la serie logarítmica diferenciada
+adf_result_log_diff <- adf.test(ts_data_log_diff)
+
+print(adf_result_log_diff)
+
+```
+
+La transformación logarítmica y la diferenciación no lograron convertir
+la serie temporal en estacionaria, según el resultado de la prueba de
+Dickey-Fuller (ADF). Un p-valor de 0.5095 es alto, lo que indica que la
+serie sigue siendo no estacionaria incluso después de aplicar estas
+transformaciones.
+
+Cuando una serie temporal no se vuelve estacionaria mediante
+transformaciones y diferenciaciones simples, es posible que haya
+factores subyacentes que influyen en la no estacionariedad. procedemos a
+utlizar otro enfoque para analizarla como el modelo ARIMA.
+
+
+
+
+
+

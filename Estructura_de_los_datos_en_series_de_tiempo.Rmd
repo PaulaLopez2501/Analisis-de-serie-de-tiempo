@@ -1,0 +1,153 @@
+# Estructura de los datos en series de tiempo
+
+
+```{r, include=FALSE}
+#cargue del data set
+folder_path <- "C:/Users/e184385/OneDrive - WFT/Desktop/Msc/Semestre 2/Analisis de series de tiempo/DJI"
+file_path <- file.path(folder_path, "dow_jones_index.data")
+
+# Leer el archivo CSV
+my_data <- read.csv(file_path, header = TRUE, sep = ",")  # `sep` para indicar que es CSV
+
+# Convertir columnas de caracteres a numéricos
+numeric_columns <- c("open", "high", "low", "close", "next_weeks_open", "next_weeks_close")  # Las columnas que contienen precios
+
+# Remover el símbolo `$` y convertir a numérico
+for (col in numeric_columns) {
+  my_data[[col]] <- as.numeric(gsub("\\$", "", my_data[[col]]))
+}
+
+# Obtener la primera y ultima fecha de data frame
+first_date <- min(my_data$date, na.rm = TRUE)  # `na.rm = TRUE` para ignorar NA
+last_date <- max(my_data$date, na.rm = TRUE)
+print(first_date)  # Primera fecha
+print(last_date)   # Última fecha
+
+# Imputar valores faltantes con la media de la columna
+my_data$percent_change_volume_over_last_wk[is.na(my_data$percent_change_volume_over_last_wk)] <- 
+  mean(my_data$percent_change_volume_over_last_wk, na.rm = TRUE)
+
+# Imputar valores faltantes con la mediana de la columna
+my_data$previous_weeks_volume[is.na(my_data$previous_weeks_volume)] <- 
+  median(my_data$previous_weeks_volume, na.rm = TRUE)
+
+# Convertir la columna 'date' a formato Date
+my_data$date <- as.Date(my_data$date, format = "%m/%d/%Y")
+
+# ordenar por fecha
+my_data <- my_data[order(my_data$date), ] 
+
+# Crear un nuevo data frame con solo IBM
+data_ibm <- subset(my_data, stock == "IBM")
+
+# Verificar la diferencia entre fechas para determinar la frecuencia
+date_diff <- diff(data_ibm$date)  # Calcular la diferencia entre fechas
+
+# Verificar la distribución de los intervalos
+table(date_diff)
+
+# Promedio de la diferencia entre fechas
+mean(date_diff)  # Para ver el intervalo promedio
+
+# Crear una serie temporal a partir de 'close' y la fecha de inicio
+# Frecuencia de 52 semanas por año, para datos semanales
+ts_data <- ts(data_ibm$close, start = c(2011, 1), frequency = 52)
+
+# Verificar la serie temporal
+print(ts_data)
+
+# Graficar la serie temporal
+plot(ts_data, type = "l", main = "Serie Temporal del Precio de Cierre de IBM", 
+     xlab = "Tiempo", ylab = "Precio de Cierre")
+
+```
+
+
+## Promedio movil
+
+El promedio móvil ayuda a suavizar las fluctuaciones de corto plazo para
+identificar tendencias a largo plazo. Existen varias formas de calcular
+promedios móviles: simples, ponderados y exponenciales.
+
+Aquí usaremos un promedio móvil simple con una ventana de 3 períodos
+(tomar el promedio de los precios de cierre de las últimas tres semanas
+en cada punto de tiempo).
+
+```{r}
+# Instalar y cargar 'zoo'
+if (!requireNamespace("zoo", quietly = TRUE)) {
+  install.packages("zoo")
+}
+suppressPackageStartupMessages(library(zoo))
+```
+
+```{r}
+
+# Crear un promedio móvil simple con ventana de 3 períodos
+ts_data_moving_avg <- rollmean(ts_data, k = 3, fill = NA)
+
+# Graficar el precio de cierre y el promedio móvil
+plot(ts_data, type = "l", col = "blue", lty = 2, main = "Precio de Cierre con Promedio Móvil",
+     xlab = "Tiempo", ylab = "Precio de Cierre")
+lines(ts_data_moving_avg, col = "red", lty = 1)
+legend("topleft", legend = c("Precio de Cierre", "Promedio Móvil (3 períodos)"), 
+       col = c("blue", "red"), lty = c(2, 1))
+
+```
+
+## Rezagos
+
+Los rezagos permiten observar cómo un valor anterior afecta a un valor
+posterior.
+
+```{r}
+# Crear un rezago de 1 período
+ts_data_lag1 <- lag(ts_data, k = 1)
+
+# Gráfica para mostrar la relación entre valores actuales y rezagos
+plot(ts_data_lag1, ts_data, xlab = "Rezago de 1 Período", ylab = "Precio de Cierre",
+     main = "Relación entre Precio de Cierre y Rezago de 1 Período",
+     col = "darkgreen", pch = 16)
+
+```
+
+```{r}
+# Crear un rezago de 1 período
+data_ibm$lag_1 <- dplyr::lag(data_ibm$close, n = 1)
+
+# Calcular la correlación entre el precio actual y el rezago
+correlation <- cor(data_ibm$close, data_ibm$lag_1, use = "complete.obs")
+
+print(correlation)  
+
+```
+
+Un valor de correlación cercano a 1 indica una relación fuerte y
+positiva, mientras que un valor cercano a 0 sugiere poca o ninguna
+relación. Un valor negativo indicaría una relación inversa.
+
+Una correlación de 0.87 sugiere que hay un patrón en el tiempo, donde el
+precio de cierre tiende a moverse de manera similar al valor anterior.
+Esto puede indicar una tendencia significativa o autocorrelación.
+
+## Estacionalidad
+
+La descomposición es un método útil para separar la tendencia, la
+estacionalidad y el componente aleatorio (ruido). Aquí se intento
+utilizar la función decompose.
+
+```{r}
+# Descomposición de la serie temporal para detectar estacionalidad
+#decomposed <- decompose(ts_data, type = "multiplicative")
+```
+
+Pero se obtuvo el siguiente error: Error in `decompose()`: ! time series
+has no or less than 2 periods Backtrace: 1. stats::decompose(ts_data,
+type = "multiplicative") Ejecución interrumpida
+
+Mi serie temporal es demasiado corta, no tiene suficientes períodos para
+un ciclo completo, solo cubre un período.La función decompose() no puede
+descomponer la serie temporal y no fue posible identificar
+estacionalidad.
+
+

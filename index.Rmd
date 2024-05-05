@@ -1,0 +1,32 @@
+---
+title: "Analisis de Dow Jone Index para materia Analisis de series de tiempo"
+author: "Paula López"
+date: "2024-05-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introducción
+
+Para el desarollo de esta actividad se elije los datos: **Dow Jones Index**
+
+Justificación: El índice Dow Jones es uno de los indicadores bursátiles más reconocidos y utilizados para medir el rendimiento de las acciones de grandes empresas estadounidenses. información sobre 30 compañías que forman parte de este índice, incluyendo precios de apertura y cierre, volumen de transacciones, precios máximos y mínimos, entre otros. Trabajar con estos datos a lo largo del curso nos permitirá desarrollar habilidades analíticas y comprender mejor la dinámica de los mercados financieros, una de las ramas donde mas se buscan a científicos de datos.
+
+Fuente: La base de datos que utilizaremos proviene del UCI Machine Learning Repository, que ofrece acceso público a datos con fines académicos y de investigación. No hay restricciones para su uso.
+
+[*https://archive.ics.uci.edu/dataset/312/dow+jones+index*](https://archive.ics.uci.edu/dataset/312/dow+jones+index){.uri}
+
+Característica de los datos:
+
+-   Tipo: Time-Series
+
+-   Tareas asociadas: Classification, Clustering
+
+-   N Instancias: 750
+
+-   N Caracteres: 15
+
+-   Fecha de creacion de data set: 10/22/2014

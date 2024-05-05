@@ -1,0 +1,190 @@
+---
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# Exploracion de datos: EDA
+
+Iniciamos la actividad con cargue de datos, limpieza y comprensión para
+saber cómo abordar el análisis.
+
+```{r}
+#cargue del data set
+folder_path <- "C:/Users/e184385/OneDrive - WFT/Desktop/Msc/Semestre 2/Analisis de series de tiempo/DJI"
+file_path <- file.path(folder_path, "dow_jones_index.data")
+
+# Leer el archivo CSV
+my_data <- read.csv(file_path, header = TRUE, sep = ",")  # `sep` para indicar que es CSV
+
+```
+
+Manejo de columnas con caracteres especiales: el archivo tiene columnas
+con valores monetarios (como \$15.82). Para evitar problemas al trabajar
+con estos datos, se elimina el símbolo \$ y se convierte los valores a
+numéricos:
+
+```{r}
+# Convertir columnas de caracteres a numéricos
+numeric_columns <- c("open", "high", "low", "close", "next_weeks_open", "next_weeks_close")  # Las columnas que contienen precios
+
+# Remover el símbolo `$` y convertir a numérico
+for (col in numeric_columns) {
+  my_data[[col]] <- as.numeric(gsub("\\$", "", my_data[[col]]))
+}
+
+```
+
+Verificación de contenido: después de cargar el archivo y convertir las
+columnas necesarias, se verifica el contenido para entender la base de
+datos
+
+```{r}
+# Mostrar la estructura del data frame
+str(my_data)
+
+```
+
+Durante el análisis se va a revisar la variación de diferentes acciones
+(stocks) en el tiempo, revisamos ahora cuantas stocks tenemos en la base
+de datos
+
+```{r}
+# Ver todos los valores únicos en la columna 'stock'
+unique(my_data$stock)  
+```
+
+Para el análisis de serie de tiempo es importante conocer el inicio y
+final del conjunto de datos.
+
+```{r}
+# Obtener la primera y ultima fecha de data frame
+first_date <- min(my_data$date, na.rm = TRUE)  # `na.rm = TRUE` para ignorar NA
+last_date <- max(my_data$date, na.rm = TRUE)
+print(first_date)  # Primera fecha
+print(last_date)   # Última fecha
+
+```
+
+Procedemos a identificar los datos faltantes para cada columna del data
+set
+
+```{r}
+# Contar el número de NA por cada columna
+na_count <- sapply(my_data, function(x) sum(is.na(x)))
+
+print(na_count)  # Muestra el número de NA en cada variable
+
+```
+
+La base de datos tiene datos faltantes, se procede a imputarlos.
+
+```{r}
+# Imputar valores faltantes con la media de la columna
+my_data$percent_change_volume_over_last_wk[is.na(my_data$percent_change_volume_over_last_wk)] <- 
+  mean(my_data$percent_change_volume_over_last_wk, na.rm = TRUE)
+
+# Imputar valores faltantes con la mediana de la columna
+my_data$previous_weeks_volume[is.na(my_data$previous_weeks_volume)] <- 
+  median(my_data$previous_weeks_volume, na.rm = TRUE)
+
+```
+
+```{r}
+# Contar el número de NA por columna
+na_count <- sapply(my_data, function(x) sum(is.na(x)))
+
+print(na_count)  # Muestra el número de NA en cada variable
+
+```
+
+Orden de data frame: Se convierte la columan Date a formato Date para
+facilitar analisis en R y se ordenan datos por fecha.
+
+```{r}
+# Convertir la columna 'date' a formato Date
+my_data$date <- as.Date(my_data$date, format = "%m/%d/%Y")
+
+# ordenar por fecha
+my_data <- my_data[order(my_data$date), ]  
+
+```
+
+Visualizacion de datos
+
+```{r}
+library(ggplot2)
+
+ggplot(my_data, aes(x = as.Date(date, "%m/%d/%Y"), y = close, color = stock)) +
+  geom_line() +  # Gráfico de línea
+  labs(title = "Precio de Cierre por Acción a lo Largo del Tiempo", x = "Fecha", y = "Precio de Cierre") +
+  theme_minimal() +
+  scale_x_date(
+    date_breaks = "1 month",  # Etiquetas cada mes
+    date_labels = "%B"  # Mostrar solo el nombre del mes
+  ) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))  # Inclinación de etiquetas
+
+```
+
+```{r}
+# Gráfico de facetas por acción
+ggplot(my_data, aes(x = as.Date(date, "%m/%d/%Y"), y = close)) +
+  geom_line() +  # Gráfico de línea
+  labs(title = "Precio de Cierre por Acción a lo Largo del Tiempo", x = "Fecha", y = "Precio de Cierre") +
+  theme_minimal() +
+  facet_wrap(~ stock)  # Facetas para cada acción
+
+
+```
+
+La base de datos contiene 30 stock, se decie de crear una base de datos
+que contenga solo una stock ""IBM" y realizar en adelante todos los
+analisis sobre esta accion.
+
+```{r}
+# Crear un nuevo data frame con solo IBM
+data_ibm <- subset(my_data, stock == "IBM")
+
+
+# Verificar el nuevo data frame
+print(unique(data_ibm$stock))  
+
+str(data_ibm)
+```
+
+Gráfico de volumen de acción IBM: El volumen es un indicador clave en el
+análisis de acciones, ya que muestra la cantidad de acciones negociadas
+durante un período. se grafica el volumen para ver cómo varía con el
+tiempo:
+
+```{r}
+library(ggplot2)
+
+# Gráfico de volumen por acción a lo largo del tiempo
+ggplot(data_ibm, aes(x = as.Date(date, "%m/%d/%Y"), y = volume, color = stock)) +
+  geom_line() +  # Gráfico de línea para volumen
+  labs(title = "Volumen de Acciones por Acción a lo Largo del Tiempo", x = "Fecha", y = "Volumen") +
+  theme_minimal() +
+  scale_x_date(date_breaks = "1 month", date_labels = "%B") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+```
+
+Gráfico de cambios porcentuales de recio La
+variable:percent_change_price muestra el cambio porcentual en el precio.
+Graficar esta variable puede proporcionar información sobre la
+volatilidad y tendencias de los precios de la accion
+
+```{r}
+# Gráfico de cambio porcentual de precio por acción
+ggplot(data_ibm, aes(x = as.Date(date, "%m/%d/%Y"), y = percent_change_price, color = stock)) +
+  geom_line() +  # Gráfico de línea para cambios porcentuales
+  labs(title = "Cambio Porcentual del Precio por Acción a lo Largo del Tiempo", x = "Fecha", y = "Cambio Porcentual") +
+  theme_minimal() +
+  scale_x_date(date_breaks = "1 month", date_labels = "%B") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+
+```
+

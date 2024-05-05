@@ -1,0 +1,4 @@
+book_filename: "YAML_tarea DJI"
+output_dir: "docs"
+clean: ["docs"]
+rmd_files: ["index.Rmd", "Exploracion_de_datos_EDA.Rmd", "Creacion_de_serie_temporal.Rmd", "Estructura_de_los_datos_en_series_de_tiempo.Rmd", "Preprocesamiento.Rmd", "Modelo_ARIMA.Rmd", "Conclusiones.Rmd"]

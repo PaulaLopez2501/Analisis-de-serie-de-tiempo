@@ -1,0 +1,191 @@
+# Modelo ARIMA
+
+
+```{r, include=FALSE}
+#cargue del data set
+folder_path <- "C:/Users/e184385/OneDrive - WFT/Desktop/Msc/Semestre 2/Analisis de series de tiempo/DJI"
+file_path <- file.path(folder_path, "dow_jones_index.data")
+
+# Leer el archivo CSV
+my_data <- read.csv(file_path, header = TRUE, sep = ",")  # `sep` para indicar que es CSV
+
+# Convertir columnas de caracteres a numéricos
+numeric_columns <- c("open", "high", "low", "close", "next_weeks_open", "next_weeks_close")  # Las columnas que contienen precios
+
+# Remover el símbolo `$` y convertir a numérico
+for (col in numeric_columns) {
+  my_data[[col]] <- as.numeric(gsub("\\$", "", my_data[[col]]))
+}
+
+# Obtener la primera y ultima fecha de data frame
+first_date <- min(my_data$date, na.rm = TRUE)  # `na.rm = TRUE` para ignorar NA
+last_date <- max(my_data$date, na.rm = TRUE)
+print(first_date)  # Primera fecha
+print(last_date)   # Última fecha
+
+# Imputar valores faltantes con la media de la columna
+my_data$percent_change_volume_over_last_wk[is.na(my_data$percent_change_volume_over_last_wk)] <- 
+  mean(my_data$percent_change_volume_over_last_wk, na.rm = TRUE)
+
+# Imputar valores faltantes con la mediana de la columna
+my_data$previous_weeks_volume[is.na(my_data$previous_weeks_volume)] <- 
+  median(my_data$previous_weeks_volume, na.rm = TRUE)
+
+# Convertir la columna 'date' a formato Date
+my_data$date <- as.Date(my_data$date, format = "%m/%d/%Y")
+
+# ordenar por fecha
+my_data <- my_data[order(my_data$date), ] 
+
+# Crear un nuevo data frame con solo IBM
+data_ibm <- subset(my_data, stock == "IBM")
+
+# Verificar la diferencia entre fechas para determinar la frecuencia
+date_diff <- diff(data_ibm$date)  # Calcular la diferencia entre fechas
+
+# Verificar la distribución de los intervalos
+table(date_diff)
+
+# Promedio de la diferencia entre fechas
+mean(date_diff)  # Para ver el intervalo promedio
+
+# Crear una serie temporal a partir de 'close' y la fecha de inicio
+# Frecuencia de 52 semanas por año, para datos semanales
+ts_data <- ts(data_ibm$close, start = c(2011, 1), frequency = 52)
+
+# Verificar la serie temporal
+print(ts_data)
+
+# Graficar la serie temporal
+plot(ts_data, type = "l", main = "Serie Temporal del Precio de Cierre de IBM", 
+     xlab = "Tiempo", ylab = "Precio de Cierre")
+
+# Cargar el paquete tseries para la prueba ADF
+suppressPackageStartupMessages(library(tseries))
+
+# Realizar la prueba de Dickey-Fuller para evaluar la estacionariedad
+adf_result <- adf.test(ts_data)
+
+# Diferenciar la serie temporal
+ts_data_diff <- diff(ts_data)
+
+# Realizar la prueba ADF en la serie diferenciada
+adf_result_diff <- adf.test(ts_data_diff)
+
+# Aplicar la transformación logarítmica
+ts_data_log <- log(ts_data)
+
+# Diferenciar la serie logarítmica
+ts_data_log_diff <- diff(ts_data_log)
+
+# Realizar la prueba ADF en la serie logarítmica diferenciada
+adf_result_log_diff <- adf.test(ts_data_log_diff)
+
+```
+
+
+
+## Identificación del modelo ARIMA
+
+El proceso de identificación generalmente comienza con el análisis de
+autocorrelación (ACF) y autocorrelación parcial (PACF). Esto ayuda a
+decidir qué valores de p y q son apropiados para el modelo.
+
+```{r}
+# Instalar los paquetes necesarios si aún no están instalados
+if(!require(forecast)) install.packages("forecast")
+if(!require(tseries)) install.packages("tseries")
+
+# Cargar los paquetes
+library(forecast)
+library(tseries)
+
+```
+
+```{r}
+# Análisis de autocorrelación para la serie diferenciada
+acf(ts_data_log_diff, main = "Autocorrelación de Serie Logarítmica Diferenciada")
+
+# Análisis de autocorrelación parcial para la serie diferenciada
+pacf(ts_data_log_diff, main = "Autocorrelación Parcial de Serie Logarítmica Diferenciada")
+
+```
+
+## Ajuste del modelo ARIMA
+
+```{r}
+# Instalar y cargar el paquete forecast si no está instalado
+if(!require(forecast)) install.packages("forecast")
+
+# Cargar la serie temporal con transformación logarítmica y diferenciación
+# (ten en cuenta que ts_data_log_diff es la serie logarítmica diferenciada)
+ts_data_log <- log(ts_data)  # Serie temporal transformada
+ts_data_log_diff <- diff(ts_data_log)  # Serie diferenciada
+
+# Utilizar auto.arima para encontrar el mejor modelo ARIMA
+arima_model <- auto.arima(ts_data_log_diff, trace = TRUE)
+
+# Mostrar detalles del modelo ARIMA seleccionado
+print(arima_model)
+
+```
+
+El mejor modelo ARIMA identificado por auto.arima() para tu serie
+temporal es un ARIMA(0,0,0) con media cero. Este tipo de modelo se
+conoce como un "modelo de ruido blanco".
+
+Media cero significa que la serie temporal no muestra ninguna
+dependencia temporal significativa. Este tipo de serie tiene varianza
+constante y ningún componente de tendencia o estacionalidad detectable.
+
+## Diagnóstico del modelo ARIMA
+
+Si el modelo ARIMA que obtuviste es ARIMA(0,0,0) con media cero, esto
+generalmente sugiere que no hay estructura significativa para modelar,
+lo que significa que la serie temporal se comporta como ruido blanco. En
+este caso, el diagnóstico y el pronóstico podrían no proporcionar mucha
+información adicional porque no hay patrones significativos en la serie
+temporal.
+
+Sin embargo, para completar el proceso de análisis del modelo ARIMA y
+confirmar que el modelo es adecuado, realizamos el diagnóstico y el
+pronóstico. Esto te ayudará a verificar si los residuos del modelo son
+efectivamente ruido blanco y permitirá observar el resultado del
+pronóstico.
+
+El diagnóstico del modelo implica revisar los residuos para asegurarse
+de que no haya patrones significativos y que se asemejen a ruido blanco.
+
+```{r}
+# Diagnóstico del modelo ARIMA: revisión de residuos
+checkresiduals(arima_model)
+
+```
+
+El resultado del test de Ljung-Box sugiere que los residuos del modelo
+ARIMA(0,0,0) con media cero son consistentes con ruido blanco. El
+p-valor de 0.7379 es alto, indicando que no hay evidencia de
+autocorrelación significativa en los residuos. Esto es una señal de que
+el modelo ARIMA ajustado es adecuado y no deja patrones residuales sin
+modelar.
+
+El resultado del test de Ljung-Box, junto con el modelo ARIMA(0,0,0) con
+media cero, sugiere que no hay patrones significativos o estructura
+predecible en la serie temporal. Esto indica que la serie temporal actúa
+como ruido blanco, con variabilidad aleatoria y sin tendencias claras.
+
+## Pronostico del Modelo ARIMA
+
+A pesar de que el modelo no muestra patrones predecibles, todavía puedes
+realizar un pronóstico para comprender cómo se comportará la serie en el
+futuro. El pronóstico de un modelo ARIMA(0,0,0) con media cero
+generalmente muestra valores cercanos a cero o variabilidad aleatoria.
+
+```{r}
+# Hacer pronóstico para los próximos períodos
+forecast_result <- forecast(arima_model, h = 10)  # Pronóstico para 10 períodos futuros
+
+# Visualizar el pronóstico
+plot(forecast_result, main = "Pronóstico con Modelo ARIMA(0,0,0)")
+
+```

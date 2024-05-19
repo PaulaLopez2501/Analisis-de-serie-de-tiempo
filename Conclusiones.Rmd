@@ -78,3 +78,16 @@ análisis:
 -   **Pronóstico con modelo ARIMA:** El pronóstico para 10 períodos
     futuros con este modelo reflejó la naturaleza de ruido blanco de la
     serie temporal, mostrando valores sin un patrón claro o predecible.
+    
+    
+## Modelo Holt-Winters
+    
+- **Modelo Holt-Winters sin componente estacional:** El modelo ajusta bien los datos históricos, mostrando que los valores ajustados siguen la tendencia observada.
+
+- **Parámetros de Suavizado:** Los parámetros alpha y beta son fundamentales para modelar la evolución temporal de los datos.
+
+- **Diagnóstico de Residuos:** La prueba de Ljung-Box mostró un p-valor alto (0.8316), indicando que los residuos no tienen autocorrelación significativa, validando la captura de variabilidad por parte del modelo.
+
+- **Pronóstico:** Las predicciones a 10 períodos ofrecen una visión del comportamiento futuro de los precios de cierre de IBM, basado en el patrón histórico.
+
+- **SSE (Sum of Squared Errors):** Un SSE bajo indica que el modelo Holt-Winters ajustado correctamente captura la variabilidad de los datos observados.

@@ -193,32 +193,37 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>El proceso de identificación generalmente comienza con el análisis de
 autocorrelación (ACF) y autocorrelación parcial (PACF). Esto ayuda a
 decidir qué valores de p y q son apropiados para el modelo.</p>
-<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="modelo-arima.html#cb44-1" tabindex="-1"></a><span class="co"># Instalar los paquetes necesarios si aún no están instalados</span></span>
-<span id="cb44-2"><a href="modelo-arima.html#cb44-2" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">require</span>(forecast)) <span class="fu">install.packages</span>(<span class="st">&quot;forecast&quot;</span>)</span>
-<span id="cb44-3"><a href="modelo-arima.html#cb44-3" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">require</span>(tseries)) <span class="fu">install.packages</span>(<span class="st">&quot;tseries&quot;</span>)</span>
-<span id="cb44-4"><a href="modelo-arima.html#cb44-4" tabindex="-1"></a></span>
-<span id="cb44-5"><a href="modelo-arima.html#cb44-5" tabindex="-1"></a><span class="co"># Cargar los paquetes</span></span>
-<span id="cb44-6"><a href="modelo-arima.html#cb44-6" tabindex="-1"></a><span class="fu">library</span>(forecast)</span>
-<span id="cb44-7"><a href="modelo-arima.html#cb44-7" tabindex="-1"></a><span class="fu">library</span>(tseries)</span></code></pre></div>
-<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="modelo-arima.html#cb45-1" tabindex="-1"></a><span class="co"># Análisis de autocorrelación para la serie diferenciada</span></span>
-<span id="cb45-2"><a href="modelo-arima.html#cb45-2" tabindex="-1"></a><span class="fu">acf</span>(ts_data_log_diff, <span class="at">main =</span> <span class="st">&quot;Autocorrelación de Serie Logarítmica Diferenciada&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="modelo-arima.html#cb48-1" tabindex="-1"></a><span class="co"># Instalar los paquetes necesarios si aún no están instalados</span></span>
+<span id="cb48-2"><a href="modelo-arima.html#cb48-2" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">require</span>(forecast)) <span class="fu">install.packages</span>(<span class="st">&quot;forecast&quot;</span>)</span></code></pre></div>
+<pre><code>## Loading required package: forecast</code></pre>
+<pre><code>## Warning: package &#39;forecast&#39; was built under R version 4.3.3</code></pre>
+<pre><code>## This is forecast 8.22.0 
+##   Stackoverflow is a great place to get help on R issues:
+##   http://stackoverflow.com/tags/forecasting+r.</code></pre>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="modelo-arima.html#cb52-1" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">require</span>(tseries)) <span class="fu">install.packages</span>(<span class="st">&quot;tseries&quot;</span>)</span>
+<span id="cb52-2"><a href="modelo-arima.html#cb52-2" tabindex="-1"></a></span>
+<span id="cb52-3"><a href="modelo-arima.html#cb52-3" tabindex="-1"></a><span class="co"># Cargar los paquetes</span></span>
+<span id="cb52-4"><a href="modelo-arima.html#cb52-4" tabindex="-1"></a><span class="fu">library</span>(forecast)</span>
+<span id="cb52-5"><a href="modelo-arima.html#cb52-5" tabindex="-1"></a><span class="fu">library</span>(tseries)</span></code></pre></div>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="modelo-arima.html#cb53-1" tabindex="-1"></a><span class="co"># Análisis de autocorrelación para la serie diferenciada</span></span>
+<span id="cb53-2"><a href="modelo-arima.html#cb53-2" tabindex="-1"></a><span class="fu">acf</span>(ts_data_log_diff, <span class="at">main =</span> <span class="st">&quot;Autocorrelación de Serie Logarítmica Diferenciada&quot;</span>)</span></code></pre></div>
 <p><img src="YAML_tarea-DJI_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
-<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="modelo-arima.html#cb46-1" tabindex="-1"></a><span class="co"># Análisis de autocorrelación parcial para la serie diferenciada</span></span>
-<span id="cb46-2"><a href="modelo-arima.html#cb46-2" tabindex="-1"></a><span class="fu">pacf</span>(ts_data_log_diff, <span class="at">main =</span> <span class="st">&quot;Autocorrelación Parcial de Serie Logarítmica Diferenciada&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="modelo-arima.html#cb54-1" tabindex="-1"></a><span class="co"># Análisis de autocorrelación parcial para la serie diferenciada</span></span>
+<span id="cb54-2"><a href="modelo-arima.html#cb54-2" tabindex="-1"></a><span class="fu">pacf</span>(ts_data_log_diff, <span class="at">main =</span> <span class="st">&quot;Autocorrelación Parcial de Serie Logarítmica Diferenciada&quot;</span>)</span></code></pre></div>
 <p><img src="YAML_tarea-DJI_files/figure-html/unnamed-chunk-30-2.png" width="672" /></p>
 </div>
 <div id="ajuste-del-modelo-arima" class="section level2 hasAnchor" number="6.2">
 <h2><span class="header-section-number">6.2</span> Ajuste del modelo ARIMA<a href="modelo-arima.html#ajuste-del-modelo-arima" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="modelo-arima.html#cb47-1" tabindex="-1"></a><span class="co"># Instalar y cargar el paquete forecast si no está instalado</span></span>
-<span id="cb47-2"><a href="modelo-arima.html#cb47-2" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">require</span>(forecast)) <span class="fu">install.packages</span>(<span class="st">&quot;forecast&quot;</span>)</span>
-<span id="cb47-3"><a href="modelo-arima.html#cb47-3" tabindex="-1"></a></span>
-<span id="cb47-4"><a href="modelo-arima.html#cb47-4" tabindex="-1"></a><span class="co"># Cargar la serie temporal con transformación logarítmica y diferenciación</span></span>
-<span id="cb47-5"><a href="modelo-arima.html#cb47-5" tabindex="-1"></a><span class="co"># (ten en cuenta que ts_data_log_diff es la serie logarítmica diferenciada)</span></span>
-<span id="cb47-6"><a href="modelo-arima.html#cb47-6" tabindex="-1"></a>ts_data_log <span class="ot">&lt;-</span> <span class="fu">log</span>(ts_data)  <span class="co"># Serie temporal transformada</span></span>
-<span id="cb47-7"><a href="modelo-arima.html#cb47-7" tabindex="-1"></a>ts_data_log_diff <span class="ot">&lt;-</span> <span class="fu">diff</span>(ts_data_log)  <span class="co"># Serie diferenciada</span></span>
-<span id="cb47-8"><a href="modelo-arima.html#cb47-8" tabindex="-1"></a></span>
-<span id="cb47-9"><a href="modelo-arima.html#cb47-9" tabindex="-1"></a><span class="co"># Utilizar auto.arima para encontrar el mejor modelo ARIMA</span></span>
-<span id="cb47-10"><a href="modelo-arima.html#cb47-10" tabindex="-1"></a>arima_model <span class="ot">&lt;-</span> <span class="fu">auto.arima</span>(ts_data_log_diff, <span class="at">trace =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="modelo-arima.html#cb55-1" tabindex="-1"></a><span class="co"># Instalar y cargar el paquete forecast si no está instalado</span></span>
+<span id="cb55-2"><a href="modelo-arima.html#cb55-2" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">require</span>(forecast)) <span class="fu">install.packages</span>(<span class="st">&quot;forecast&quot;</span>)</span>
+<span id="cb55-3"><a href="modelo-arima.html#cb55-3" tabindex="-1"></a></span>
+<span id="cb55-4"><a href="modelo-arima.html#cb55-4" tabindex="-1"></a><span class="co"># Cargar la serie temporal con transformación logarítmica y diferenciación</span></span>
+<span id="cb55-5"><a href="modelo-arima.html#cb55-5" tabindex="-1"></a><span class="co"># (ten en cuenta que ts_data_log_diff es la serie logarítmica diferenciada)</span></span>
+<span id="cb55-6"><a href="modelo-arima.html#cb55-6" tabindex="-1"></a>ts_data_log <span class="ot">&lt;-</span> <span class="fu">log</span>(ts_data)  <span class="co"># Serie temporal transformada</span></span>
+<span id="cb55-7"><a href="modelo-arima.html#cb55-7" tabindex="-1"></a>ts_data_log_diff <span class="ot">&lt;-</span> <span class="fu">diff</span>(ts_data_log)  <span class="co"># Serie diferenciada</span></span>
+<span id="cb55-8"><a href="modelo-arima.html#cb55-8" tabindex="-1"></a></span>
+<span id="cb55-9"><a href="modelo-arima.html#cb55-9" tabindex="-1"></a><span class="co"># Utilizar auto.arima para encontrar el mejor modelo ARIMA</span></span>
+<span id="cb55-10"><a href="modelo-arima.html#cb55-10" tabindex="-1"></a>arima_model <span class="ot">&lt;-</span> <span class="fu">auto.arima</span>(ts_data_log_diff, <span class="at">trace =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <pre><code>## 
 ##  Fitting models using approximations to speed things up...
 ## 
@@ -234,8 +239,8 @@ decidir qué valores de p y q son apropiados para el modelo.</p>
 ##  ARIMA(0,0,0)            with zero mean     : -121.9732
 ## 
 ##  Best model: ARIMA(0,0,0)            with zero mean</code></pre>
-<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="modelo-arima.html#cb49-1" tabindex="-1"></a><span class="co"># Mostrar detalles del modelo ARIMA seleccionado</span></span>
-<span id="cb49-2"><a href="modelo-arima.html#cb49-2" tabindex="-1"></a><span class="fu">print</span>(arima_model)</span></code></pre></div>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="modelo-arima.html#cb57-1" tabindex="-1"></a><span class="co"># Mostrar detalles del modelo ARIMA seleccionado</span></span>
+<span id="cb57-2"><a href="modelo-arima.html#cb57-2" tabindex="-1"></a><span class="fu">print</span>(arima_model)</span></code></pre></div>
 <pre><code>## Series: ts_data_log_diff 
 ## ARIMA(0,0,0) with zero mean 
 ## 
@@ -263,8 +268,8 @@ efectivamente ruido blanco y permitirá observar el resultado del
 pronóstico.</p>
 <p>El diagnóstico del modelo implica revisar los residuos para asegurarse
 de que no haya patrones significativos y que se asemejen a ruido blanco.</p>
-<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="modelo-arima.html#cb51-1" tabindex="-1"></a><span class="co"># Diagnóstico del modelo ARIMA: revisión de residuos</span></span>
-<span id="cb51-2"><a href="modelo-arima.html#cb51-2" tabindex="-1"></a><span class="fu">checkresiduals</span>(arima_model)</span></code></pre></div>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="modelo-arima.html#cb59-1" tabindex="-1"></a><span class="co"># Diagnóstico del modelo ARIMA: revisión de residuos</span></span>
+<span id="cb59-2"><a href="modelo-arima.html#cb59-2" tabindex="-1"></a><span class="fu">checkresiduals</span>(arima_model)</span></code></pre></div>
 <p><img src="YAML_tarea-DJI_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
 <pre><code>## 
 ##  Ljung-Box test
@@ -290,11 +295,11 @@ como ruido blanco, con variabilidad aleatoria y sin tendencias claras.</p>
 realizar un pronóstico para comprender cómo se comportará la serie en el
 futuro. El pronóstico de un modelo ARIMA(0,0,0) con media cero
 generalmente muestra valores cercanos a cero o variabilidad aleatoria.</p>
-<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="modelo-arima.html#cb53-1" tabindex="-1"></a><span class="co"># Hacer pronóstico para los próximos períodos</span></span>
-<span id="cb53-2"><a href="modelo-arima.html#cb53-2" tabindex="-1"></a>forecast_result <span class="ot">&lt;-</span> <span class="fu">forecast</span>(arima_model, <span class="at">h =</span> <span class="dv">10</span>)  <span class="co"># Pronóstico para 10 períodos futuros</span></span>
-<span id="cb53-3"><a href="modelo-arima.html#cb53-3" tabindex="-1"></a></span>
-<span id="cb53-4"><a href="modelo-arima.html#cb53-4" tabindex="-1"></a><span class="co"># Visualizar el pronóstico</span></span>
-<span id="cb53-5"><a href="modelo-arima.html#cb53-5" tabindex="-1"></a><span class="fu">plot</span>(forecast_result, <span class="at">main =</span> <span class="st">&quot;Pronóstico con Modelo ARIMA(0,0,0)&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="modelo-arima.html#cb61-1" tabindex="-1"></a><span class="co"># Hacer pronóstico para los próximos períodos</span></span>
+<span id="cb61-2"><a href="modelo-arima.html#cb61-2" tabindex="-1"></a>forecast_result <span class="ot">&lt;-</span> <span class="fu">forecast</span>(arima_model, <span class="at">h =</span> <span class="dv">10</span>)  <span class="co"># Pronóstico para 10 períodos futuros</span></span>
+<span id="cb61-3"><a href="modelo-arima.html#cb61-3" tabindex="-1"></a></span>
+<span id="cb61-4"><a href="modelo-arima.html#cb61-4" tabindex="-1"></a><span class="co"># Visualizar el pronóstico</span></span>
+<span id="cb61-5"><a href="modelo-arima.html#cb61-5" tabindex="-1"></a><span class="fu">plot</span>(forecast_result, <span class="at">main =</span> <span class="st">&quot;Pronóstico con Modelo ARIMA(0,0,0)&quot;</span>)</span></code></pre></div>
 <p><img src="YAML_tarea-DJI_files/figure-html/unnamed-chunk-33-1.png" width="672" /></p>
 
 </div>

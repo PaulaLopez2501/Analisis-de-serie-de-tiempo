@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Analisis de Dow Jone Index para materia Analisis de series de tiempo</title>
-  <meta name="description" content="Analisis de Dow Jone Index para materia Analisis de series de tiempo" />
+  <title>8 Inclusion de variables en el tiempo | Analisis de Dow Jone Index para materia Analisis de series de tiempo</title>
+  <meta name="description" content="8 Inclusion de variables en el tiempo | Analisis de Dow Jone Index para materia Analisis de series de tiempo" />
   <meta name="generator" content="bookdown 0.39 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Analisis de Dow Jone Index para materia Analisis de series de tiempo" />
+  <meta property="og:title" content="8 Inclusion de variables en el tiempo | Analisis de Dow Jone Index para materia Analisis de series de tiempo" />
   <meta property="og:type" content="book" />
   
   
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Analisis de Dow Jone Index para materia Analisis de series de tiempo" />
+  <meta name="twitter:title" content="8 Inclusion de variables en el tiempo | Analisis de Dow Jone Index para materia Analisis de series de tiempo" />
   
   
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-
-<link rel="next" href="exploracion-de-datos-eda.html"/>
+<link rel="prev" href="holter_winter.html"/>
+<link rel="next" href="conclusiones.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -193,25 +193,71 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="header">
-<h1 class="title">Analisis de Dow Jone Index para materia Analisis de series de tiempo</h1>
-<p class="author"><em>Paula López</em></p>
-<p class="date"><em>2024-05-01</em></p>
-</div>
-<div id="introducción" class="section level1 hasAnchor" number="1">
-<h1><span class="header-section-number">1</span> Introducción<a href="index.html#introducción" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p>Para el desarollo de esta actividad se elije los datos: <strong>Dow Jones Index</strong></p>
-<p>Justificación: El índice Dow Jones es uno de los indicadores bursátiles más reconocidos y utilizados para medir el rendimiento de las acciones de grandes empresas estadounidenses. información sobre 30 compañías que forman parte de este índice, incluyendo precios de apertura y cierre, volumen de transacciones, precios máximos y mínimos, entre otros. Trabajar con estos datos a lo largo del curso nos permitirá desarrollar habilidades analíticas y comprender mejor la dinámica de los mercados financieros, una de las ramas donde mas se buscan a científicos de datos.</p>
-<p>Fuente: La base de datos que utilizaremos proviene del UCI Machine Learning Repository, que ofrece acceso público a datos con fines académicos y de investigación. No hay restricciones para su uso.</p>
-<p><a href="https://archive.ics.uci.edu/dataset/312/dow+jones+index" class="uri"><em>https://archive.ics.uci.edu/dataset/312/dow+jones+index</em></a></p>
-<p>Característica de los datos:</p>
+<div id="inclusion-de-variables-en-el-tiempo" class="section level1 hasAnchor" number="8">
+<h1><span class="header-section-number">8</span> Inclusion de variables en el tiempo<a href="inclusion-de-variables-en-el-tiempo.html#inclusion-de-variables-en-el-tiempo" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="inclusion-de-variables-en-el-tiempo.html#cb69-1" tabindex="-1"></a><span class="co"># Seleccionar la variable de interés (precio de cierre)</span></span>
+<span id="cb69-2"><a href="inclusion-de-variables-en-el-tiempo.html#cb69-2" tabindex="-1"></a>y <span class="ot">&lt;-</span> data_ibm<span class="sc">$</span>close</span>
+<span id="cb69-3"><a href="inclusion-de-variables-en-el-tiempo.html#cb69-3" tabindex="-1"></a></span>
+<span id="cb69-4"><a href="inclusion-de-variables-en-el-tiempo.html#cb69-4" tabindex="-1"></a><span class="co"># Ajuste del modelo lineal básico</span></span>
+<span id="cb69-5"><a href="inclusion-de-variables-en-el-tiempo.html#cb69-5" tabindex="-1"></a>lm_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> open <span class="sc">+</span> high <span class="sc">+</span> low <span class="sc">+</span> volume, <span class="at">data =</span> data_ibm)</span>
+<span id="cb69-6"><a href="inclusion-de-variables-en-el-tiempo.html#cb69-6" tabindex="-1"></a></span>
+<span id="cb69-7"><a href="inclusion-de-variables-en-el-tiempo.html#cb69-7" tabindex="-1"></a><span class="co"># Mostrar un resumen del modelo</span></span>
+<span id="cb69-8"><a href="inclusion-de-variables-en-el-tiempo.html#cb69-8" tabindex="-1"></a><span class="fu">summary</span>(lm_model)</span></code></pre></div>
+<pre><code>## 
+## Call:
+## lm(formula = y ~ open + high + low + volume, data = data_ibm)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -1.8415 -0.8975  0.1009  1.2151  2.6185 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept)  1.226e+01  7.655e+00   1.601   0.1250  
+## open        -2.295e-01  1.463e-01  -1.569   0.1323  
+## high         5.930e-01  2.138e-01   2.773   0.0117 *
+## low          5.714e-01  2.372e-01   2.410   0.0257 *
+## volume      -5.377e-08  7.505e-08  -0.716   0.4820  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.329 on 20 degrees of freedom
+## Multiple R-squared:  0.9552, Adjusted R-squared:  0.9462 
+## F-statistic: 106.5 on 4 and 20 DF,  p-value: 3.468e-13</code></pre>
+<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb71-1"><a href="inclusion-de-variables-en-el-tiempo.html#cb71-1" tabindex="-1"></a><span class="co"># Diagnóstico del modelo lineal: revisión de residuos</span></span>
+<span id="cb71-2"><a href="inclusion-de-variables-en-el-tiempo.html#cb71-2" tabindex="-1"></a><span class="fu">plot</span>(lm_model, <span class="at">which =</span> <span class="dv">1</span>)  <span class="co"># Residuos vs valores ajustados</span></span></code></pre></div>
+<p><img src="YAML_tarea-DJI_files/figure-html/unnamed-chunk-38-1.png" width="672" /></p>
+<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb72-1"><a href="inclusion-de-variables-en-el-tiempo.html#cb72-1" tabindex="-1"></a><span class="fu">plot</span>(lm_model, <span class="at">which =</span> <span class="dv">2</span>)  <span class="co"># QQ plot de los residuos</span></span></code></pre></div>
+<p><img src="YAML_tarea-DJI_files/figure-html/unnamed-chunk-38-2.png" width="672" /></p>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb73-1"><a href="inclusion-de-variables-en-el-tiempo.html#cb73-1" tabindex="-1"></a><span class="co"># Hacer predicciones con el modelo lineal</span></span>
+<span id="cb73-2"><a href="inclusion-de-variables-en-el-tiempo.html#cb73-2" tabindex="-1"></a>predictions <span class="ot">&lt;-</span> <span class="fu">predict</span>(lm_model, <span class="at">newdata =</span> data_ibm)</span>
+<span id="cb73-3"><a href="inclusion-de-variables-en-el-tiempo.html#cb73-3" tabindex="-1"></a></span>
+<span id="cb73-4"><a href="inclusion-de-variables-en-el-tiempo.html#cb73-4" tabindex="-1"></a><span class="co"># Visualizar las predicciones si es relevante</span></span>
+<span id="cb73-5"><a href="inclusion-de-variables-en-el-tiempo.html#cb73-5" tabindex="-1"></a><span class="fu">plot</span>(data_ibm<span class="sc">$</span>date, y, <span class="at">type =</span> <span class="st">&quot;l&quot;</span>, <span class="at">col =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">ylim =</span> <span class="fu">range</span>(y, predictions), </span>
+<span id="cb73-6"><a href="inclusion-de-variables-en-el-tiempo.html#cb73-6" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">&quot;Predicciones del Modelo Lineal&quot;</span>, <span class="at">xlab =</span> <span class="st">&quot;Fecha&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;Precio de Cierre&quot;</span>)</span>
+<span id="cb73-7"><a href="inclusion-de-variables-en-el-tiempo.html#cb73-7" tabindex="-1"></a><span class="fu">lines</span>(data_ibm<span class="sc">$</span>date, predictions, <span class="at">col =</span> <span class="st">&quot;red&quot;</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb73-8"><a href="inclusion-de-variables-en-el-tiempo.html#cb73-8" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">&quot;topright&quot;</span>, <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">&quot;Observado&quot;</span>, <span class="st">&quot;Predicción&quot;</span>), <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;blue&quot;</span>, <span class="st">&quot;red&quot;</span>), <span class="at">lwd =</span> <span class="dv">2</span>)</span></code></pre></div>
+<p><img src="YAML_tarea-DJI_files/figure-html/unnamed-chunk-38-3.png" width="672" /></p>
+<p><strong>Coeficientes de Regresión</strong></p>
 <ul>
-<li><p>Tipo: Time-Series</p></li>
-<li><p>Tareas asociadas: Classification, Clustering</p></li>
-<li><p>N Instancias: 750</p></li>
-<li><p>N Caracteres: 15</p></li>
-<li><p>Fecha de creacion de data set: 10/22/2014</p></li>
+<li><p>El intercepto del modelo es 12.26, lo que sugiere el valor esperado del precio de cierre cuando todas las variables independientes son cero.</p></li>
+<li><p>El coeficiente para ‘open’ es −0.2295, lo que indica que un aumento en el precio de apertura está asociado con una ligera disminución en el precio de cierre, aunque no es estadísticamente significativo.</p></li>
+<li><p>‘high’ tiene un coeficiente de 0.5930, lo que indica que un aumento en el precio máximo diario está asociado con un aumento en el precio de cierre. Este efecto es estadísticamente significativo (valor p = 0.0117).</p></li>
+<li><p>‘low’ tiene un coeficiente de 0.5714, lo que indica que un aumento en el precio mínimo diario está asociado con un aumento en el precio de cierre. Este efecto también es estadísticamente significativo (valor p = 0.0257).</p></li>
+<li><p>‘volume’ muestra un coeficiente muy pequeño (−5.377×10−8−), lo que sugiere que el volumen de operaciones no tiene un efecto significativo en el precio de cierre (valor p = 0.4820).</p></li>
 </ul>
+<p><strong>Bondad de Ajuste</strong></p>
+<ul>
+<li><p>El modelo explica aproximadamente el 94.62% de la variabilidad en el precio de cierre de IBM, como se indica por el R2 ajustado de 0.9462.</p></li>
+<li><p>Esto sugiere que las variables incluidas (open, high, low, volume) son capaces de explicar una gran parte de la variación en el precio de cierre observado.</p></li>
+</ul>
+<p><strong>Significación Estadística</strong></p>
+<ul>
+<li><p>‘high’ y ‘low’ son las variables que muestran significación estadística en relación con el precio de cierre. ‘high’ tiene un efecto positivo significativo, mientras que ‘low’ tiene un efecto positivo pero ligeramente menor en magnitud.</p></li>
+<li><p>‘open’ y ‘volume’, aunque presentes en el modelo, no tienen un efecto estadísticamente significativo en el precio de cierre.</p></li>
+</ul>
+<p><strong>Diagnóstico del Modelo</strong></p>
+<p>Los residuos del modelo parecen razonables, con una distribución que no muestra patrones claros de no linealidad ni heterocedasticidad (variación no constante de los errores).</p>
 
 </div>
             </section>
@@ -219,8 +265,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           </div>
         </div>
       </div>
-
-<a href="exploracion-de-datos-eda.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="holter_winter.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="conclusiones.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

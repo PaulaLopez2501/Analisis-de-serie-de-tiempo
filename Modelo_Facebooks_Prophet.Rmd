@@ -1,0 +1,209 @@
+# Modelo Facebook's Prophet
+
+```{r, include=FALSE}
+#cargue del data set
+folder_path <- "C:/Users/e184385/OneDrive - WFT/Desktop/Msc/Semestre 2/Analisis de series de tiempo/DJI"
+file_path <- file.path(folder_path, "dow_jones_index.data")
+
+# Leer el archivo CSV
+my_data <- read.csv(file_path, header = TRUE, sep = ",")  # `sep` para indicar que es CSV
+
+# Convertir columnas de caracteres a numéricos
+numeric_columns <- c("open", "high", "low", "close", "next_weeks_open", "next_weeks_close")  # Las columnas que contienen precios
+
+# Remover el símbolo `$` y convertir a numérico
+for (col in numeric_columns) {
+  my_data[[col]] <- as.numeric(gsub("\\$", "", my_data[[col]]))
+}
+
+# Obtener la primera y ultima fecha de data frame
+first_date <- min(my_data$date, na.rm = TRUE)  # `na.rm = TRUE` para ignorar NA
+last_date <- max(my_data$date, na.rm = TRUE)
+print(first_date)  # Primera fecha
+print(last_date)   # Última fecha
+
+# Imputar valores faltantes con la media de la columna
+my_data$percent_change_volume_over_last_wk[is.na(my_data$percent_change_volume_over_last_wk)] <- 
+  mean(my_data$percent_change_volume_over_last_wk, na.rm = TRUE)
+
+# Imputar valores faltantes con la mediana de la columna
+my_data$previous_weeks_volume[is.na(my_data$previous_weeks_volume)] <- 
+  median(my_data$previous_weeks_volume, na.rm = TRUE)
+
+# Convertir la columna 'date' a formato Date
+my_data$date <- as.Date(my_data$date, format = "%m/%d/%Y")
+
+# ordenar por fecha
+my_data <- my_data[order(my_data$date), ] 
+
+# Crear un nuevo data frame con solo IBM
+data_ibm <- subset(my_data, stock == "IBM")
+
+# Verificar la diferencia entre fechas para determinar la frecuencia
+date_diff <- diff(data_ibm$date)  # Calcular la diferencia entre fechas
+
+# Verificar la distribución de los intervalos
+table(date_diff)
+
+# Promedio de la diferencia entre fechas
+mean(date_diff)  # Para ver el intervalo promedio
+
+# Crear una serie temporal a partir de 'close' y la fecha de inicio
+# Frecuencia de 52 semanas por año, para datos semanales
+ts_data <- ts(data_ibm$close, start = c(2011, 1), frequency = 52)
+
+# Verificar la serie temporal
+print(ts_data)
+
+# Graficar la serie temporal
+plot(ts_data, type = "l", main = "Serie Temporal del Precio de Cierre de IBM", 
+     xlab = "Tiempo", ylab = "Precio de Cierre")
+
+# Cargar el paquete tseries para la prueba ADF
+suppressPackageStartupMessages(library(tseries))
+
+# Realizar la prueba de Dickey-Fuller para evaluar la estacionariedad
+adf_result <- adf.test(ts_data)
+
+# Diferenciar la serie temporal
+ts_data_diff <- diff(ts_data)
+
+# Realizar la prueba ADF en la serie diferenciada
+adf_result_diff <- adf.test(ts_data_diff)
+
+# Aplicar la transformación logarítmica
+ts_data_log <- log(ts_data)
+
+# Diferenciar la serie logarítmica
+ts_data_log_diff <- diff(ts_data_log)
+
+# Realizar la prueba ADF en la serie logarítmica diferenciada
+adf_result_log_diff <- adf.test(ts_data_log_diff)
+
+# Instalar los paquetes necesarios si aún no están instalados
+if(!require(forecast)) install.packages("forecast")
+if(!require(tseries)) install.packages("tseries")
+
+# Cargar los paquetes
+library(forecast)
+library(tseries)
+
+# Análisis de autocorrelación para la serie diferenciada
+acf(ts_data_log_diff, main = "Autocorrelación de Serie Logarítmica Diferenciada")
+
+# Análisis de autocorrelación parcial para la serie diferenciada
+pacf(ts_data_log_diff, main = "Autocorrelación Parcial de Serie Logarítmica Diferenciada")
+
+# Instalar y cargar el paquete forecast si no está instalado
+if(!require(forecast)) install.packages("forecast")
+
+# Cargar la serie temporal con transformación logarítmica y diferenciación
+# (ten en cuenta que ts_data_log_diff es la serie logarítmica diferenciada)
+ts_data_log <- log(ts_data)  # Serie temporal transformada
+ts_data_log_diff <- diff(ts_data_log)  # Serie diferenciada
+
+# Utilizar auto.arima para encontrar el mejor modelo ARIMA
+arima_model <- auto.arima(ts_data_log_diff, trace = TRUE)
+
+# Diagnóstico del modelo ARIMA: revisión de residuos
+checkresiduals(arima_model)
+
+# Hacer pronóstico para los próximos períodos
+forecast_result <- forecast(arima_model, h = 10)  # Pronóstico para 10 períodos futuros
+
+# Visualizar el pronóstico
+plot(forecast_result, main = "Pronóstico con Modelo ARIMA(0,0,0)")
+
+# Instalar y cargar el paquete forecast si no está instalado
+if(!require(forecast)) install.packages("forecast")
+
+# Cargar el paquete
+library(forecast)
+
+# Aplicar el modelo Holt-Winters sin componente estacional
+hw_model <- HoltWinters(ts_data, gamma = FALSE)
+
+# Ver el resumen del modelo Holt-Winters
+summary(hw_model)
+
+# Diagnóstico del modelo Holt-Winters: revisión de residuos
+checkresiduals(hw_model)
+
+# Realizar el pronóstico para los próximos 10 períodos
+hw_forecast <- forecast(hw_model, h = 10)
+
+# Aplicar el suavizamiento exponencial simple
+ses_model <- ses(ts_data, h = 10)
+
+
+#Inclusion de variables en el tiempo
+
+# Seleccionar la variable de interés (precio de cierre)
+y <- data_ibm$close
+
+# Ajuste del modelo lineal básico
+lm_model <- lm(y ~ open + high + low + volume, data = data_ibm)
+
+# Mostrar un resumen del modelo
+summary(lm_model)
+
+# Diagnóstico del modelo lineal: revisión de residuos
+plot(lm_model, which = 1)  # Residuos vs valores ajustados
+plot(lm_model, which = 2)  # QQ plot de los residuos
+
+# Hacer predicciones con el modelo lineal
+predictions <- predict(lm_model, newdata = data_ibm)
+
+# Visualizar las predicciones si es relevante
+plot(data_ibm$date, y, type = "l", col = "blue", lwd = 2, ylim = range(y, predictions), 
+     main = "Predicciones del Modelo Lineal", xlab = "Fecha", ylab = "Precio de Cierre")
+lines(data_ibm$date, predictions, col = "red", lwd = 2)
+legend("topright", legend = c("Observado", "Predicción"), col = c("blue", "red"), lwd = 2)
+
+```
+
+##Preparación de la serie temporal Para aplicar el algoritmo Facebook's Prophet a tu serie temporal de precios de cierre de IBM, primero necesitas preparar los datos de acuerdo con los requisitos de Prophet y luego ajustar el modelo.
+
+```{r}
+library(prophet)
+
+# Convertir la serie temporal a un data frame para Prophet
+ts_data_prophet <- data.frame(
+  ds = time(ts_data),  # Columna de fechas
+  y = as.numeric(ts_data)  # Columna de valores numéricos (precio de cierre)
+)
+
+```
+
+##Ajuste del modelo Prophet
+
+```{r}
+# Inicializar un nuevo modelo Prophet
+m <- prophet()
+
+# Ajustar el modelo Prophet
+fit <- fit.prophet(m, ts_data_prophet)
+
+```
+
+Explicación de las advertencias y decisiones automáticas que hace Prophet durante el ajuste del modelo.
+
+**Disabling yearly, weekly, y daily seasonality:** Prophet ha decidido desactivar la estacionalidad anual, semanal y diaria automáticamente para este modelo. Prophet intenta identificar automáticamente patrones estacionales en los datos. Si no detecta suficiente evidencia de estacionalidad en estas frecuencias, las desactiva para evitar ajustes innecesarios que podrían llevar a sobreajustar el modelo.
+
+Aunque Prophet ha desactivado las estacionalidades, es posible que los datos de series temporales no muestren patrones claros en estas escalas de tiempo específicas (anual, semanal, diaria). Esto es común en datos financieros donde las estacionalidades pueden ser menos evidentes que en otros tipos de datos.
+
+**n.changepoints greater than number of observations:** Prophet utiliza puntos de cambio para modelar cambios en las tendencias de los datos a lo largo del tiempo. Este mensaje indica que ha detectado más puntos de cambio potenciales de los que hay observaciones en tus datos. En este caso, Prophet ha decidido utilizar 19 puntos de cambio.
+
+.
+
+## Pronóstico con Prophet
+
+```{r}
+# Realizar el pronóstico para los próximos períodos
+future <- make_future_dataframe(fit, periods = 3, freq = "week")  # Pronóstico para 3 semanas
+forecast <- predict(fit, future)
+
+# Visualizar el pronóstico
+plot(forecast, xlabel = "Fecha", ylabel = "Precio de Cierre", main = "Pronóstico con Modelo Prophet")
+
+```

@@ -200,10 +200,12 @@ Aunque Prophet ha desactivado las estacionalidades, es posible que los datos de 
 
 ```{r}
 # Realizar el pronóstico para los próximos períodos
-future <- make_future_dataframe(fit, periods = 3, freq = "week")  # Pronóstico para 3 semanas
+future <- make_future_dataframe(fit, periods = 2, freq = "week")  # Pronóstico para 2 semanas
 forecast <- predict(fit, future)
 
 # Visualizar el pronóstico
 plot(forecast, xlabel = "Fecha", ylabel = "Precio de Cierre", main = "Pronóstico con Modelo Prophet")
 
 ```
+
+.

@@ -160,12 +160,13 @@ plot(data_ibm$date, y, type = "l", col = "blue", lwd = 2, ylim = range(y, predic
 lines(data_ibm$date, predictions, col = "red", lwd = 2)
 legend("topright", legend = c("Observado", "Predicción"), col = c("blue", "red"), lwd = 2)
 
+library(prophet)
 ```
 
-##Preparación de la serie temporal Para aplicar el algoritmo Facebook's Prophet a tu serie temporal de precios de cierre de IBM, primero necesitas preparar los datos de acuerdo con los requisitos de Prophet y luego ajustar el modelo.
+## Preparación de la serie temporal
 
 ```{r}
-library(prophet)
+
 
 # Convertir la serie temporal a un data frame para Prophet
 ts_data_prophet <- data.frame(
@@ -175,7 +176,7 @@ ts_data_prophet <- data.frame(
 
 ```
 
-##Ajuste del modelo Prophet
+## Ajuste del modelo Prophet
 
 ```{r}
 # Inicializar un nuevo modelo Prophet
@@ -193,19 +194,5 @@ Explicación de las advertencias y decisiones automáticas que hace Prophet dura
 Aunque Prophet ha desactivado las estacionalidades, es posible que los datos de series temporales no muestren patrones claros en estas escalas de tiempo específicas (anual, semanal, diaria). Esto es común en datos financieros donde las estacionalidades pueden ser menos evidentes que en otros tipos de datos.
 
 **n.changepoints greater than number of observations:** Prophet utiliza puntos de cambio para modelar cambios en las tendencias de los datos a lo largo del tiempo. Este mensaje indica que ha detectado más puntos de cambio potenciales de los que hay observaciones en tus datos. En este caso, Prophet ha decidido utilizar 19 puntos de cambio.
-
-.
-
-## Pronóstico con Prophet
-
-```{r}
-# Realizar el pronóstico para los próximos períodos
-future <- make_future_dataframe(fit, periods = 2, freq = "week")  # Pronóstico para 2 semanas
-forecast <- predict(fit, future)
-
-# Visualizar el pronóstico
-plot(forecast, xlabel = "Fecha", ylabel = "Precio de Cierre", main = "Pronóstico con Modelo Prophet")
-
-```
 
 .

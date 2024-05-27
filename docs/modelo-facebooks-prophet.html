@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Analisis de Dow Jone Index para materia Analisis de series de tiempo</title>
-  <meta name="description" content="Analisis de Dow Jone Index para materia Analisis de series de tiempo" />
+  <title>9 Modelo Facebook’s Prophet | Analisis de Dow Jone Index para materia Analisis de series de tiempo</title>
+  <meta name="description" content="9 Modelo Facebook’s Prophet | Analisis de Dow Jone Index para materia Analisis de series de tiempo" />
   <meta name="generator" content="bookdown 0.39 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Analisis de Dow Jone Index para materia Analisis de series de tiempo" />
+  <meta property="og:title" content="9 Modelo Facebook’s Prophet | Analisis de Dow Jone Index para materia Analisis de series de tiempo" />
   <meta property="og:type" content="book" />
   
   
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Analisis de Dow Jone Index para materia Analisis de series de tiempo" />
+  <meta name="twitter:title" content="9 Modelo Facebook’s Prophet | Analisis de Dow Jone Index para materia Analisis de series de tiempo" />
   
   
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-
-<link rel="next" href="exploracion-de-datos-eda.html"/>
+<link rel="prev" href="inclusion-de-variables-en-el-tiempo.html"/>
+<link rel="next" href="conclusiones-y-comentarios.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -199,35 +199,42 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="header">
-<h1 class="title">Analisis de Dow Jone Index para materia Analisis de series de tiempo</h1>
-<p class="author"><em>Paula López</em></p>
-<p class="date"><em>2024-05-01</em></p>
+<div id="modelo-facebooks-prophet" class="section level1 hasAnchor" number="9">
+<h1><span class="header-section-number">9</span> Modelo Facebook’s Prophet<a href="modelo-facebooks-prophet.html#modelo-facebooks-prophet" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="preparación-de-la-serie-temporal" class="section level2 hasAnchor" number="9.1">
+<h2><span class="header-section-number">9.1</span> Preparación de la serie temporal<a href="modelo-facebooks-prophet.html#preparación-de-la-serie-temporal" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb66-1"><a href="modelo-facebooks-prophet.html#cb66-1" tabindex="-1"></a><span class="co"># Convertir la serie temporal a un data frame para Prophet</span></span>
+<span id="cb66-2"><a href="modelo-facebooks-prophet.html#cb66-2" tabindex="-1"></a>ts_data_prophet <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb66-3"><a href="modelo-facebooks-prophet.html#cb66-3" tabindex="-1"></a>  <span class="at">ds =</span> <span class="fu">time</span>(ts_data),  <span class="co"># Columna de fechas</span></span>
+<span id="cb66-4"><a href="modelo-facebooks-prophet.html#cb66-4" tabindex="-1"></a>  <span class="at">y =</span> <span class="fu">as.numeric</span>(ts_data)  <span class="co"># Columna de valores numéricos (precio de cierre)</span></span>
+<span id="cb66-5"><a href="modelo-facebooks-prophet.html#cb66-5" tabindex="-1"></a>)</span></code></pre></div>
 </div>
-<div id="introducción" class="section level1 hasAnchor" number="1">
-<h1><span class="header-section-number">1</span> Introducción<a href="index.html#introducción" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p>Para el desarollo de esta actividad se elije los datos: <strong>Dow Jones Index</strong></p>
-<p>Justificación: El índice Dow Jones es uno de los indicadores bursátiles más reconocidos y utilizados para medir el rendimiento de las acciones de grandes empresas estadounidenses. información sobre 30 compañías que forman parte de este índice, incluyendo precios de apertura y cierre, volumen de transacciones, precios máximos y mínimos, entre otros. Trabajar con estos datos a lo largo del curso nos permitirá desarrollar habilidades analíticas y comprender mejor la dinámica de los mercados financieros, una de las ramas donde mas se buscan a científicos de datos.</p>
-<p>Fuente: La base de datos que utilizaremos proviene del UCI Machine Learning Repository, que ofrece acceso público a datos con fines académicos y de investigación. No hay restricciones para su uso.</p>
-<p><a href="https://archive.ics.uci.edu/dataset/312/dow+jones+index" class="uri"><em>https://archive.ics.uci.edu/dataset/312/dow+jones+index</em></a></p>
-<p>Característica de los datos:</p>
-<ul>
-<li><p>Tipo: Time-Series</p></li>
-<li><p>Tareas asociadas: Classification, Clustering</p></li>
-<li><p>N Instancias: 750</p></li>
-<li><p>N Caracteres: 15</p></li>
-</ul>
-<p>Fecha de creacion de data set: 10/22/2014</p>
+<div id="ajuste-del-modelo-prophet" class="section level2 hasAnchor" number="9.2">
+<h2><span class="header-section-number">9.2</span> Ajuste del modelo Prophet<a href="modelo-facebooks-prophet.html#ajuste-del-modelo-prophet" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="modelo-facebooks-prophet.html#cb67-1" tabindex="-1"></a><span class="co"># Inicializar un nuevo modelo Prophet</span></span>
+<span id="cb67-2"><a href="modelo-facebooks-prophet.html#cb67-2" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">prophet</span>()</span>
+<span id="cb67-3"><a href="modelo-facebooks-prophet.html#cb67-3" tabindex="-1"></a></span>
+<span id="cb67-4"><a href="modelo-facebooks-prophet.html#cb67-4" tabindex="-1"></a><span class="co"># Ajustar el modelo Prophet</span></span>
+<span id="cb67-5"><a href="modelo-facebooks-prophet.html#cb67-5" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">fit.prophet</span>(m, ts_data_prophet)</span></code></pre></div>
+<pre><code>## Disabling yearly seasonality. Run prophet with yearly.seasonality=TRUE to override this.</code></pre>
+<pre><code>## Disabling weekly seasonality. Run prophet with weekly.seasonality=TRUE to override this.</code></pre>
+<pre><code>## Disabling daily seasonality. Run prophet with daily.seasonality=TRUE to override this.</code></pre>
+<pre><code>## n.changepoints greater than number of observations. Using 19</code></pre>
+<p>Explicación de las advertencias y decisiones automáticas que hace Prophet durante el ajuste del modelo.</p>
+<p><strong>Disabling yearly, weekly, y daily seasonality:</strong> Prophet ha decidido desactivar la estacionalidad anual, semanal y diaria automáticamente para este modelo. Prophet intenta identificar automáticamente patrones estacionales en los datos. Si no detecta suficiente evidencia de estacionalidad en estas frecuencias, las desactiva para evitar ajustes innecesarios que podrían llevar a sobreajustar el modelo.</p>
+<p>Aunque Prophet ha desactivado las estacionalidades, es posible que los datos de series temporales no muestren patrones claros en estas escalas de tiempo específicas (anual, semanal, diaria). Esto es común en datos financieros donde las estacionalidades pueden ser menos evidentes que en otros tipos de datos.</p>
+<p><strong>n.changepoints greater than number of observations:</strong> Prophet utiliza puntos de cambio para modelar cambios en las tendencias de los datos a lo largo del tiempo. Este mensaje indica que ha detectado más puntos de cambio potenciales de los que hay observaciones en tus datos. En este caso, Prophet ha decidido utilizar 19 puntos de cambio.</p>
 <p>.</p>
 
+</div>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-
-<a href="exploracion-de-datos-eda.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="inclusion-de-variables-en-el-tiempo.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="conclusiones-y-comentarios.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

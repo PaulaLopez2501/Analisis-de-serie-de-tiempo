@@ -168,13 +168,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="7.2" data-path="holter_winter.html"><a href="holter_winter.html#suavizamiento-exponencial-simple"><i class="fa fa-check"></i><b>7.2</b> Suavizamiento Exponencial Simple</a></li>
 </ul></li>
 <li class="chapter" data-level="8" data-path="inclusion-de-variables-en-el-tiempo.html"><a href="inclusion-de-variables-en-el-tiempo.html"><i class="fa fa-check"></i><b>8</b> Inclusion de variables en el tiempo</a></li>
-<li class="chapter" data-level="9" data-path="conclusiones.html"><a href="conclusiones.html"><i class="fa fa-check"></i><b>9</b> Conclusiones</a>
+<li class="chapter" data-level="9" data-path="modelo-facebooks-prophet.html"><a href="modelo-facebooks-prophet.html"><i class="fa fa-check"></i><b>9</b> Modelo Facebook’s Prophet</a>
 <ul>
-<li class="chapter" data-level="9.1" data-path="conclusiones.html"><a href="conclusiones.html#preprocesamiento-de-datos"><i class="fa fa-check"></i><b>9.1</b> Preprocesamiento de datos</a></li>
-<li class="chapter" data-level="9.2" data-path="conclusiones.html"><a href="conclusiones.html#creacion-de-serie-temporal"><i class="fa fa-check"></i><b>9.2</b> Creacion de serie temporal</a></li>
-<li class="chapter" data-level="9.3" data-path="conclusiones.html"><a href="conclusiones.html#estructura-de-datos-en-series-temporales"><i class="fa fa-check"></i><b>9.3</b> Estructura de datos en series temporales</a></li>
-<li class="chapter" data-level="9.4" data-path="conclusiones.html"><a href="conclusiones.html#análisis-de-modelo-arima"><i class="fa fa-check"></i><b>9.4</b> Análisis de modelo ARIMA</a></li>
-<li class="chapter" data-level="9.5" data-path="conclusiones.html"><a href="conclusiones.html#modelo-holt-winters"><i class="fa fa-check"></i><b>9.5</b> Modelo Holt-Winters</a></li>
+<li class="chapter" data-level="9.1" data-path="modelo-facebooks-prophet.html"><a href="modelo-facebooks-prophet.html#preparación-de-la-serie-temporal"><i class="fa fa-check"></i><b>9.1</b> Preparación de la serie temporal</a></li>
+<li class="chapter" data-level="9.2" data-path="modelo-facebooks-prophet.html"><a href="modelo-facebooks-prophet.html#ajuste-del-modelo-prophet"><i class="fa fa-check"></i><b>9.2</b> Ajuste del modelo Prophet</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="conclusiones-y-comentarios.html"><a href="conclusiones-y-comentarios.html"><i class="fa fa-check"></i><b>10</b> Conclusiones y comentarios</a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="conclusiones-y-comentarios.html"><a href="conclusiones-y-comentarios.html#preprocesamiento-de-datos"><i class="fa fa-check"></i><b>10.1</b> Preprocesamiento de datos</a></li>
+<li class="chapter" data-level="10.2" data-path="conclusiones-y-comentarios.html"><a href="conclusiones-y-comentarios.html#creacion-de-serie-temporal"><i class="fa fa-check"></i><b>10.2</b> Creacion de serie temporal</a></li>
+<li class="chapter" data-level="10.3" data-path="conclusiones-y-comentarios.html"><a href="conclusiones-y-comentarios.html#estructura-de-datos-en-series-temporales"><i class="fa fa-check"></i><b>10.3</b> Estructura de datos en series temporales</a></li>
+<li class="chapter" data-level="10.4" data-path="conclusiones-y-comentarios.html"><a href="conclusiones-y-comentarios.html#análisis-de-modelo-arima"><i class="fa fa-check"></i><b>10.4</b> Análisis de modelo ARIMA</a></li>
+<li class="chapter" data-level="10.5" data-path="conclusiones-y-comentarios.html"><a href="conclusiones-y-comentarios.html#modelo-holt-winters"><i class="fa fa-check"></i><b>10.5</b> Modelo Holt-Winters</a></li>
+<li class="chapter" data-level="10.6" data-path="conclusiones-y-comentarios.html"><a href="conclusiones-y-comentarios.html#modelo-facebooks-prophet-1"><i class="fa fa-check"></i><b>10.6</b> Modelo Facebook’s Prophet</a></li>
 </ul></li>
 </ul>
 
@@ -198,11 +204,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="aplicación-el-modelo-holt-winters" class="section level2 hasAnchor" number="7.1">
 <h2><span class="header-section-number">7.1</span> Aplicación el modelo Holt-Winters<a href="holter_winter.html#aplicación-el-modelo-holt-winters" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Dado que la serie temporal es demasiado corta para identificar estacionalidad y no se pudo hacer la descomposición, procederemos a aplicar la metodología de Holt-Winters sin componente estacional y Aplicar el suavizamiento exponencial simple (SES) como una alternativa.</p>
-<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="holter_winter.html#cb62-1" tabindex="-1"></a><span class="co"># Aplicar el modelo Holt-Winters sin componente estacional</span></span>
-<span id="cb62-2"><a href="holter_winter.html#cb62-2" tabindex="-1"></a>hw_model <span class="ot">&lt;-</span> <span class="fu">HoltWinters</span>(ts_data, <span class="at">gamma =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb62-3"><a href="holter_winter.html#cb62-3" tabindex="-1"></a></span>
-<span id="cb62-4"><a href="holter_winter.html#cb62-4" tabindex="-1"></a><span class="co"># Ver el resumen del modelo Holt-Winters</span></span>
-<span id="cb62-5"><a href="holter_winter.html#cb62-5" tabindex="-1"></a><span class="fu">summary</span>(hw_model)</span></code></pre></div>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="holter_winter.html#cb54-1" tabindex="-1"></a><span class="co"># Aplicar el modelo Holt-Winters sin componente estacional</span></span>
+<span id="cb54-2"><a href="holter_winter.html#cb54-2" tabindex="-1"></a>hw_model <span class="ot">&lt;-</span> <span class="fu">HoltWinters</span>(ts_data, <span class="at">gamma =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb54-3"><a href="holter_winter.html#cb54-3" tabindex="-1"></a></span>
+<span id="cb54-4"><a href="holter_winter.html#cb54-4" tabindex="-1"></a><span class="co"># Ver el resumen del modelo Holt-Winters</span></span>
+<span id="cb54-5"><a href="holter_winter.html#cb54-5" tabindex="-1"></a><span class="fu">summary</span>(hw_model)</span></code></pre></div>
 <pre><code>##              Length Class  Mode     
 ## fitted       69     mts    numeric  
 ## x            25     ts     numeric  
@@ -213,11 +219,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## seasonal      1     -none- character
 ## SSE           1     -none- numeric  
 ## call          3     -none- call</code></pre>
-<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="holter_winter.html#cb64-1" tabindex="-1"></a><span class="co"># Graficar los componentes del modelo Holt-Winters sin estacionalidad</span></span>
-<span id="cb64-2"><a href="holter_winter.html#cb64-2" tabindex="-1"></a><span class="fu">plot</span>(hw_model)</span></code></pre></div>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="holter_winter.html#cb56-1" tabindex="-1"></a><span class="co"># Graficar los componentes del modelo Holt-Winters sin estacionalidad</span></span>
+<span id="cb56-2"><a href="holter_winter.html#cb56-2" tabindex="-1"></a><span class="fu">plot</span>(hw_model)</span></code></pre></div>
 <p><img src="YAML_tarea-DJI_files/figure-html/unnamed-chunk-35-1.png" width="672" /></p>
-<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="holter_winter.html#cb65-1" tabindex="-1"></a><span class="co"># Diagnóstico del modelo Holt-Winters: revisión de residuos</span></span>
-<span id="cb65-2"><a href="holter_winter.html#cb65-2" tabindex="-1"></a><span class="fu">checkresiduals</span>(hw_model)</span></code></pre></div>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="holter_winter.html#cb57-1" tabindex="-1"></a><span class="co"># Diagnóstico del modelo Holt-Winters: revisión de residuos</span></span>
+<span id="cb57-2"><a href="holter_winter.html#cb57-2" tabindex="-1"></a><span class="fu">checkresiduals</span>(hw_model)</span></code></pre></div>
 <p><img src="YAML_tarea-DJI_files/figure-html/unnamed-chunk-35-2.png" width="672" /></p>
 <pre><code>## 
 ##  Ljung-Box test
@@ -226,23 +232,24 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## Q* = 2.1248, df = 5, p-value = 0.8316
 ## 
 ## Model df: 0.   Total lags used: 5</code></pre>
-<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="holter_winter.html#cb67-1" tabindex="-1"></a><span class="co"># Realizar el pronóstico para los próximos 10 períodos</span></span>
-<span id="cb67-2"><a href="holter_winter.html#cb67-2" tabindex="-1"></a>hw_forecast <span class="ot">&lt;-</span> <span class="fu">forecast</span>(hw_model, <span class="at">h =</span> <span class="dv">10</span>)</span>
-<span id="cb67-3"><a href="holter_winter.html#cb67-3" tabindex="-1"></a></span>
-<span id="cb67-4"><a href="holter_winter.html#cb67-4" tabindex="-1"></a><span class="co"># Visualizar el pronóstico</span></span>
-<span id="cb67-5"><a href="holter_winter.html#cb67-5" tabindex="-1"></a><span class="fu">plot</span>(hw_forecast)</span></code></pre></div>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="holter_winter.html#cb59-1" tabindex="-1"></a><span class="co"># Realizar el pronóstico para los próximos 10 períodos</span></span>
+<span id="cb59-2"><a href="holter_winter.html#cb59-2" tabindex="-1"></a>hw_forecast <span class="ot">&lt;-</span> <span class="fu">forecast</span>(hw_model, <span class="at">h =</span> <span class="dv">10</span>)</span>
+<span id="cb59-3"><a href="holter_winter.html#cb59-3" tabindex="-1"></a></span>
+<span id="cb59-4"><a href="holter_winter.html#cb59-4" tabindex="-1"></a><span class="co"># Visualizar el pronóstico</span></span>
+<span id="cb59-5"><a href="holter_winter.html#cb59-5" tabindex="-1"></a><span class="fu">plot</span>(hw_forecast)</span></code></pre></div>
 <p><img src="YAML_tarea-DJI_files/figure-html/unnamed-chunk-35-3.png" width="672" /></p>
 <p>El modelo Holt-Winters sin componente estacional se ajusta bien a los datos históricos, reflejado en la estrecha correspondencia entre la serie temporal original y los valores ajustados. Los parámetros de suavizado (alpha y beta) son cruciales para modelar la evolución temporal. La prueba de Ljung-Box indica que los residuos no tienen autocorrelación significativa (p = 0.8316), sugiriendo que el modelo captura la variabilidad de manera efectiva. El pronóstico a 10 períodos permite anticipar el comportamiento futuro de los precios de cierre de IBM, respaldado por un SSE bajo que indica un ajuste preciso del modelo a los datos observados.</p>
 <p>/</p>
 </div>
 <div id="suavizamiento-exponencial-simple" class="section level2 hasAnchor" number="7.2">
 <h2><span class="header-section-number">7.2</span> Suavizamiento Exponencial Simple<a href="holter_winter.html#suavizamiento-exponencial-simple" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="holter_winter.html#cb68-1" tabindex="-1"></a><span class="co"># Aplicar el suavizamiento exponencial simple</span></span>
-<span id="cb68-2"><a href="holter_winter.html#cb68-2" tabindex="-1"></a>ses_model <span class="ot">&lt;-</span> <span class="fu">ses</span>(ts_data, <span class="at">h =</span> <span class="dv">10</span>)</span>
-<span id="cb68-3"><a href="holter_winter.html#cb68-3" tabindex="-1"></a></span>
-<span id="cb68-4"><a href="holter_winter.html#cb68-4" tabindex="-1"></a><span class="co"># Visualizar el suavizamiento y el pronóstico</span></span>
-<span id="cb68-5"><a href="holter_winter.html#cb68-5" tabindex="-1"></a><span class="fu">plot</span>(ses_model)</span></code></pre></div>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="holter_winter.html#cb60-1" tabindex="-1"></a><span class="co"># Aplicar el suavizamiento exponencial simple</span></span>
+<span id="cb60-2"><a href="holter_winter.html#cb60-2" tabindex="-1"></a>ses_model <span class="ot">&lt;-</span> <span class="fu">ses</span>(ts_data, <span class="at">h =</span> <span class="dv">10</span>)</span>
+<span id="cb60-3"><a href="holter_winter.html#cb60-3" tabindex="-1"></a></span>
+<span id="cb60-4"><a href="holter_winter.html#cb60-4" tabindex="-1"></a><span class="co"># Visualizar el suavizamiento y el pronóstico</span></span>
+<span id="cb60-5"><a href="holter_winter.html#cb60-5" tabindex="-1"></a><span class="fu">plot</span>(ses_model)</span></code></pre></div>
 <p><img src="YAML_tarea-DJI_files/figure-html/unnamed-chunk-36-1.png" width="672" /></p>
+<p>.</p>
 
 </div>
 </div>

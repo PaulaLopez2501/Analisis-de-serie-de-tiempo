@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Analisis de Dow Jone Index para materia Analisis de series de tiempo</title>
-  <meta name="description" content="Analisis de Dow Jone Index para materia Analisis de series de tiempo" />
+  <title>7 Modelo Holter_Winter | Analisis de Dow Jone Index para materia Analisis de series de tiempo</title>
+  <meta name="description" content="7 Modelo Holter_Winter | Analisis de Dow Jone Index para materia Analisis de series de tiempo" />
   <meta name="generator" content="bookdown 0.39 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Analisis de Dow Jone Index para materia Analisis de series de tiempo" />
+  <meta property="og:title" content="7 Modelo Holter_Winter | Analisis de Dow Jone Index para materia Analisis de series de tiempo" />
   <meta property="og:type" content="book" />
   
   
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Analisis de Dow Jone Index para materia Analisis de series de tiempo" />
+  <meta name="twitter:title" content="7 Modelo Holter_Winter | Analisis de Dow Jone Index para materia Analisis de series de tiempo" />
   
   
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-
-<link rel="next" href="exploracion-de-datos-eda.html"/>
+<link rel="prev" href="modelo-arima.html"/>
+<link rel="next" href="inclusion-de-variables-en-el-tiempo.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -211,35 +211,67 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="header">
-<h1 class="title">Analisis de Dow Jone Index para materia Analisis de series de tiempo</h1>
-<p class="author"><em>Paula López</em></p>
-<p class="date"><em>2024-05-01</em></p>
+<div id="modelo-holter_winter" class="section level1 hasAnchor" number="7">
+<h1><span class="header-section-number">7</span> Modelo Holter_Winter<a href="modelo-holter_winter.html#modelo-holter_winter" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="aplicación-el-modelo-holt-winters" class="section level2 hasAnchor" number="7.1">
+<h2><span class="header-section-number">7.1</span> Aplicación el modelo Holt-Winters<a href="modelo-holter_winter.html#aplicación-el-modelo-holt-winters" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Dado que la serie temporal es demasiado corta para identificar estacionalidad y no se pudo hacer la descomposición, procederemos a aplicar la metodología de Holt-Winters sin componente estacional y Aplicar el suavizamiento exponencial simple (SES) como una alternativa.</p>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="modelo-holter_winter.html#cb62-1" tabindex="-1"></a><span class="co"># Aplicar el modelo Holt-Winters sin componente estacional</span></span>
+<span id="cb62-2"><a href="modelo-holter_winter.html#cb62-2" tabindex="-1"></a>hw_model <span class="ot">&lt;-</span> <span class="fu">HoltWinters</span>(ts_data, <span class="at">gamma =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb62-3"><a href="modelo-holter_winter.html#cb62-3" tabindex="-1"></a></span>
+<span id="cb62-4"><a href="modelo-holter_winter.html#cb62-4" tabindex="-1"></a><span class="co"># Ver el resumen del modelo Holt-Winters</span></span>
+<span id="cb62-5"><a href="modelo-holter_winter.html#cb62-5" tabindex="-1"></a><span class="fu">summary</span>(hw_model)</span></code></pre></div>
+<pre><code>##              Length Class  Mode     
+## fitted       69     mts    numeric  
+## x            25     ts     numeric  
+## alpha         1     -none- numeric  
+## beta          1     -none- numeric  
+## gamma         1     -none- logical  
+## coefficients  2     -none- numeric  
+## seasonal      1     -none- character
+## SSE           1     -none- numeric  
+## call          3     -none- call</code></pre>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="modelo-holter_winter.html#cb64-1" tabindex="-1"></a><span class="co"># Graficar los componentes del modelo Holt-Winters sin estacionalidad</span></span>
+<span id="cb64-2"><a href="modelo-holter_winter.html#cb64-2" tabindex="-1"></a><span class="fu">plot</span>(hw_model)</span></code></pre></div>
+<p><img src="YAML_tarea-DJI_files/figure-html/unnamed-chunk-35-1.png" width="672" /></p>
+<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="modelo-holter_winter.html#cb65-1" tabindex="-1"></a><span class="co"># Diagnóstico del modelo Holt-Winters: revisión de residuos</span></span>
+<span id="cb65-2"><a href="modelo-holter_winter.html#cb65-2" tabindex="-1"></a><span class="fu">checkresiduals</span>(hw_model)</span></code></pre></div>
+<p><img src="YAML_tarea-DJI_files/figure-html/unnamed-chunk-35-2.png" width="672" /></p>
+<pre><code>## 
+##  Ljung-Box test
+## 
+## data:  Residuals from HoltWinters
+## Q* = 2.1248, df = 5, p-value = 0.8316
+## 
+## Model df: 0.   Total lags used: 5</code></pre>
+<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="modelo-holter_winter.html#cb67-1" tabindex="-1"></a><span class="co"># Realizar el pronóstico para los próximos 10 períodos</span></span>
+<span id="cb67-2"><a href="modelo-holter_winter.html#cb67-2" tabindex="-1"></a>hw_forecast <span class="ot">&lt;-</span> <span class="fu">forecast</span>(hw_model, <span class="at">h =</span> <span class="dv">10</span>)</span>
+<span id="cb67-3"><a href="modelo-holter_winter.html#cb67-3" tabindex="-1"></a></span>
+<span id="cb67-4"><a href="modelo-holter_winter.html#cb67-4" tabindex="-1"></a><span class="co"># Visualizar el pronóstico</span></span>
+<span id="cb67-5"><a href="modelo-holter_winter.html#cb67-5" tabindex="-1"></a><span class="fu">plot</span>(hw_forecast)</span></code></pre></div>
+<p><img src="YAML_tarea-DJI_files/figure-html/unnamed-chunk-35-3.png" width="672" /></p>
+<p>El modelo Holt-Winters sin componente estacional se ajusta bien a los datos históricos, reflejado en la estrecha correspondencia entre la serie temporal original y los valores ajustados. Los parámetros de suavizado (alpha y beta) son cruciales para modelar la evolución temporal. La prueba de Ljung-Box indica que los residuos no tienen autocorrelación significativa (p = 0.8316), sugiriendo que el modelo captura la variabilidad de manera efectiva. El pronóstico a 10 períodos permite anticipar el comportamiento futuro de los precios de cierre de IBM, respaldado por un SSE bajo que indica un ajuste preciso del modelo a los datos observados.</p>
+<p>/</p>
 </div>
-<div id="introducción" class="section level1 hasAnchor" number="1">
-<h1><span class="header-section-number">1</span> Introducción<a href="index.html#introducción" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p>Para el desarollo de esta actividad se elije los datos: <strong>Dow Jones Index</strong></p>
-<p>Justificación: El índice Dow Jones es uno de los indicadores bursátiles más reconocidos y utilizados para medir el rendimiento de las acciones de grandes empresas estadounidenses. información sobre 30 compañías que forman parte de este índice, incluyendo precios de apertura y cierre, volumen de transacciones, precios máximos y mínimos, entre otros. Trabajar con estos datos a lo largo del curso nos permitirá desarrollar habilidades analíticas y comprender mejor la dinámica de los mercados financieros, una de las ramas donde mas se buscan a científicos de datos.</p>
-<p>Fuente: La base de datos que utilizaremos proviene del UCI Machine Learning Repository, que ofrece acceso público a datos con fines académicos y de investigación. No hay restricciones para su uso.</p>
-<p><a href="https://archive.ics.uci.edu/dataset/312/dow+jones+index" class="uri"><em>https://archive.ics.uci.edu/dataset/312/dow+jones+index</em></a></p>
-<p>Característica de los datos:</p>
-<ul>
-<li><p>Tipo: Time-Series</p></li>
-<li><p>Tareas asociadas: Classification, Clustering</p></li>
-<li><p>N Instancias: 750</p></li>
-<li><p>N Caracteres: 15</p></li>
-</ul>
-<p>Fecha de creacion de data set: 10/22/2014</p>
+<div id="suavizamiento-exponencial-simple" class="section level2 hasAnchor" number="7.2">
+<h2><span class="header-section-number">7.2</span> Suavizamiento Exponencial Simple<a href="modelo-holter_winter.html#suavizamiento-exponencial-simple" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="modelo-holter_winter.html#cb68-1" tabindex="-1"></a><span class="co"># Aplicar el suavizamiento exponencial simple</span></span>
+<span id="cb68-2"><a href="modelo-holter_winter.html#cb68-2" tabindex="-1"></a>ses_model <span class="ot">&lt;-</span> <span class="fu">ses</span>(ts_data, <span class="at">h =</span> <span class="dv">10</span>)</span>
+<span id="cb68-3"><a href="modelo-holter_winter.html#cb68-3" tabindex="-1"></a></span>
+<span id="cb68-4"><a href="modelo-holter_winter.html#cb68-4" tabindex="-1"></a><span class="co"># Visualizar el suavizamiento y el pronóstico</span></span>
+<span id="cb68-5"><a href="modelo-holter_winter.html#cb68-5" tabindex="-1"></a><span class="fu">plot</span>(ses_model)</span></code></pre></div>
+<p><img src="YAML_tarea-DJI_files/figure-html/unnamed-chunk-36-1.png" width="672" /></p>
 <p>.</p>
 
+</div>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-
-<a href="exploracion-de-datos-eda.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="modelo-arima.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="inclusion-de-variables-en-el-tiempo.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

@@ -165,34 +165,40 @@ library(prophet)
 
 ## Preparación de la serie temporal
 
+Prophet requiere que los datos tengan dos columnas: ds para la fecha y y para el valor a predecir.
+
 ```{r}
 
+# Crear el dataframe con las columnas necesarias para Prophet
+prophet_data <- data.frame(ds = data_ibm$date, y = data_ibm$close)
 
-# Convertir la serie temporal a un data frame para Prophet
-ts_data_prophet <- data.frame(
-  ds = time(ts_data),  # Columna de fechas
-  y = as.numeric(ts_data)  # Columna de valores numéricos (precio de cierre)
-)
 
 ```
 
 ## Ajuste del modelo Prophet
 
 ```{r}
-# Inicializar un nuevo modelo Prophet
-m <- prophet()
+# Crear y ajustar el modelo Prophet
+prophet_model <- prophet(prophet_data)
 
-# Ajustar el modelo Prophet
-fit <- fit.prophet(m, ts_data_prophet)
+# Crear un dataframe para futuros valores a predecir
+future <- make_future_dataframe(prophet_model, periods = 10, freq = 'week')
+
+# Hacer las predicciones
+forecast <- predict(prophet_model, future)
+
+# Visualizar el pronóstico
+plot(prophet_model, forecast)
+prophet_plot_components(prophet_model, forecast)
 
 ```
 
-Explicación de las advertencias y decisiones automáticas que hace Prophet durante el ajuste del modelo.
+-    **Predicción a Futuro:** El modelo proyecta una continuación de la tendencia a la baja con un intervalo de confianza que se amplía a medida que avanza el tiempo, lo que refleja la creciente incertidumbre en las predicciones futuras.
 
-**Disabling yearly, weekly, y daily seasonality:** Prophet ha decidido desactivar la estacionalidad anual, semanal y diaria automáticamente para este modelo. Prophet intenta identificar automáticamente patrones estacionales en los datos. Si no detecta suficiente evidencia de estacionalidad en estas frecuencias, las desactiva para evitar ajustes innecesarios que podrían llevar a sobreajustar el modelo.
+-    **Patrón Semanal:** Hay un patrón claro de variación en los precios a lo largo de la semana. Los precios tienden a ser más bajos al inicio de la semana (domingo, lunes y martes), alcanzan su punto más alto a mitad de semana (miércoles, jueves y viernes), y vuelven a bajar hacia el fin de semana (sábado).
 
-Aunque Prophet ha desactivado las estacionalidades, es posible que los datos de series temporales no muestren patrones claros en estas escalas de tiempo específicas (anual, semanal, diaria). Esto es común en datos financieros donde las estacionalidades pueden ser menos evidentes que en otros tipos de datos.
+-   **Implicaciones:** Este patrón sugiere que hay ciertos días de la semana donde la actividad en el mercado o las decisiones de inversión tienen un impacto mayor en los precios. Esto puede ser útil para los traders que buscan optimizar sus estrategias de entrada y salida.
 
-**n.changepoints greater than number of observations:** Prophet utiliza puntos de cambio para modelar cambios en las tendencias de los datos a lo largo del tiempo. Este mensaje indica que ha detectado más puntos de cambio potenciales de los que hay observaciones en tus datos. En este caso, Prophet ha decidido utilizar 19 puntos de cambio.
+-    **Ajustes del Modelo:** unque el modelo Prophet ha capturado la tendencia general y la estacionalidad semanal, sería beneficioso incluir más datos históricos y considerar otros factores externos, como eventos macroeconómicos o cambios en la empresa IBM, para mejorar la precisión del modelo.
 
-.
+-    **Estrategias de Trading:** Los traders pueden considerar la estacionalidad semanal al planificar sus estrategias de compra y venta. Por ejemplo, podrían optar por vender en los días con precios más altos y comprar en los días con precios más bajos.

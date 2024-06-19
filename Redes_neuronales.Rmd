@@ -1,0 +1,435 @@
+---
+editor_options: 
+  markdown: 
+    wrap: sentence
+---
+
+# Redes Neuronales
+
+```{r, include=FALSE}
+#cargue del data set
+folder_path <- "C:/Users/e184385/OneDrive - WFT/Desktop/Msc/Semestre 2/Analisis de series de tiempo/DJI"
+file_path <- file.path(folder_path, "dow_jones_index.data")
+
+# Leer el archivo CSV
+my_data <- read.csv(file_path, header = TRUE, sep = ",")  # `sep` para indicar que es CSV
+
+# Convertir columnas de caracteres a numéricos
+numeric_columns <- c("open", "high", "low", "close", "next_weeks_open", "next_weeks_close")  # Las columnas que contienen precios
+
+# Remover el símbolo `$` y convertir a numérico
+for (col in numeric_columns) {
+  my_data[[col]] <- as.numeric(gsub("\\$", "", my_data[[col]]))
+}
+
+# Obtener la primera y ultima fecha de data frame
+first_date <- min(my_data$date, na.rm = TRUE)  # `na.rm = TRUE` para ignorar NA
+last_date <- max(my_data$date, na.rm = TRUE)
+print(first_date)  # Primera fecha
+print(last_date)   # Última fecha
+
+# Imputar valores faltantes con la media de la columna
+my_data$percent_change_volume_over_last_wk[is.na(my_data$percent_change_volume_over_last_wk)] <- 
+  mean(my_data$percent_change_volume_over_last_wk, na.rm = TRUE)
+
+# Imputar valores faltantes con la mediana de la columna
+my_data$previous_weeks_volume[is.na(my_data$previous_weeks_volume)] <- 
+  median(my_data$previous_weeks_volume, na.rm = TRUE)
+
+# Convertir la columna 'date' a formato Date
+my_data$date <- as.Date(my_data$date, format = "%m/%d/%Y")
+
+# ordenar por fecha
+my_data <- my_data[order(my_data$date), ] 
+
+# Crear un nuevo data frame con solo IBM
+data_ibm <- subset(my_data, stock == "IBM")
+
+# Verificar la diferencia entre fechas para determinar la frecuencia
+date_diff <- diff(data_ibm$date)  # Calcular la diferencia entre fechas
+
+# Verificar la distribución de los intervalos
+table(date_diff)
+
+# Promedio de la diferencia entre fechas
+mean(date_diff)  # Para ver el intervalo promedio
+
+# Crear una serie temporal a partir de 'close' y la fecha de inicio
+# Frecuencia de 52 semanas por año, para datos semanales
+ts_data <- ts(data_ibm$close, start = c(2011, 1), frequency = 52)
+
+# Verificar la serie temporal
+print(ts_data)
+
+# Graficar la serie temporal
+plot(ts_data, type = "l", main = "Serie Temporal del Precio de Cierre de IBM", 
+     xlab = "Tiempo", ylab = "Precio de Cierre")
+
+# Cargar el paquete tseries para la prueba ADF
+suppressPackageStartupMessages(library(tseries))
+
+# Realizar la prueba de Dickey-Fuller para evaluar la estacionariedad
+adf_result <- adf.test(ts_data)
+
+# Diferenciar la serie temporal
+ts_data_diff <- diff(ts_data)
+
+# Realizar la prueba ADF en la serie diferenciada
+adf_result_diff <- adf.test(ts_data_diff)
+
+# Aplicar la transformación logarítmica
+ts_data_log <- log(ts_data)
+
+# Diferenciar la serie logarítmica
+ts_data_log_diff <- diff(ts_data_log)
+
+# Realizar la prueba ADF en la serie logarítmica diferenciada
+adf_result_log_diff <- adf.test(ts_data_log_diff)
+
+# Instalar los paquetes necesarios si aún no están instalados
+if(!require(forecast)) install.packages("forecast")
+if(!require(tseries)) install.packages("tseries")
+
+# Cargar los paquetes
+library(forecast)
+library(tseries)
+
+# Análisis de autocorrelación para la serie diferenciada
+acf(ts_data_log_diff, main = "Autocorrelación de Serie Logarítmica Diferenciada")
+
+# Análisis de autocorrelación parcial para la serie diferenciada
+pacf(ts_data_log_diff, main = "Autocorrelación Parcial de Serie Logarítmica Diferenciada")
+
+# Instalar y cargar el paquete forecast si no está instalado
+if(!require(forecast)) install.packages("forecast")
+
+# Cargar la serie temporal con transformación logarítmica y diferenciación
+# (ten en cuenta que ts_data_log_diff es la serie logarítmica diferenciada)
+ts_data_log <- log(ts_data)  # Serie temporal transformada
+ts_data_log_diff <- diff(ts_data_log)  # Serie diferenciada
+
+# Utilizar auto.arima para encontrar el mejor modelo ARIMA
+arima_model <- auto.arima(ts_data_log_diff, trace = TRUE)
+
+# Diagnóstico del modelo ARIMA: revisión de residuos
+checkresiduals(arima_model)
+
+# Hacer pronóstico para los próximos períodos
+forecast_result <- forecast(arima_model, h = 10)  # Pronóstico para 10 períodos futuros
+
+# Visualizar el pronóstico
+plot(forecast_result, main = "Pronóstico con Modelo ARIMA(0,0,0)")
+
+# Instalar y cargar el paquete forecast si no está instalado
+if(!require(forecast)) install.packages("forecast")
+
+# Cargar el paquete
+library(forecast)
+
+# Aplicar el modelo Holt-Winters sin componente estacional
+hw_model <- HoltWinters(ts_data, gamma = FALSE)
+
+# Ver el resumen del modelo Holt-Winters
+summary(hw_model)
+
+# Diagnóstico del modelo Holt-Winters: revisión de residuos
+checkresiduals(hw_model)
+
+# Realizar el pronóstico para los próximos 10 períodos
+hw_forecast <- forecast(hw_model, h = 10)
+
+# Aplicar el suavizamiento exponencial simple
+ses_model <- ses(ts_data, h = 10)
+
+
+#Inclusion de variables en el tiempo
+
+# Seleccionar la variable de interés (precio de cierre)
+y <- data_ibm$close
+
+# Ajuste del modelo lineal básico
+lm_model <- lm(y ~ open + high + low + volume, data = data_ibm)
+
+# Mostrar un resumen del modelo
+summary(lm_model)
+
+# Diagnóstico del modelo lineal: revisión de residuos
+plot(lm_model, which = 1)  # Residuos vs valores ajustados
+plot(lm_model, which = 2)  # QQ plot de los residuos
+
+# Hacer predicciones con el modelo lineal
+predictions <- predict(lm_model, newdata = data_ibm)
+
+# Visualizar las predicciones si es relevante
+plot(data_ibm$date, y, type = "l", col = "blue", lwd = 2, ylim = range(y, predictions), 
+     main = "Predicciones del Modelo Lineal", xlab = "Fecha", ylab = "Precio de Cierre")
+lines(data_ibm$date, predictions, col = "red", lwd = 2)
+legend("topright", legend = c("Observado", "Predicción"), col = c("blue", "red"), lwd = 2)
+
+library(prophet)
+# Crear el dataframe con las columnas necesarias para Prophet
+prophet_data <- data.frame(ds = data_ibm$date, y = data_ibm$close)
+
+# Crear y ajustar el modelo Prophet
+prophet_model <- prophet(prophet_data)
+
+# Crear un dataframe para futuros valores a predecir
+future <- make_future_dataframe(prophet_model, periods = 10, freq = 'week')
+
+# Hacer las predicciones
+forecast <- predict(prophet_model, future)
+
+# Visualizar el pronóstico
+plot(prophet_model, forecast)
+prophet_plot_components(prophet_model, forecast)
+```
+
+## Preparación de datos
+
+Dividir los datos en conjuntos de entrenamiento y prueba, y normalizarlos si es necesario.
+
+```{r, message = FALSE}
+# Cargar los paquetes necesarios
+if (!require(RSNNS)) install.packages("RSNNS")
+library(RSNNS)
+
+# Normalizar los datos
+normalize <- function(x) {
+  return((x - min(x)) / (max(x) - min(x)))
+}
+
+# Normalizar la columna de precios de cierre
+data_ibm$close_normalized <- normalize(data_ibm$close)
+
+# Verificar la normalización
+print(head(data_ibm$close_normalized))
+
+```
+
+.
+
+## División de los datos en conjuntos de entrenamiento y prueba
+
+```{r}
+# Dividir los datos en conjuntos de entrenamiento y prueba
+train_size <- floor(0.8 * nrow(data_ibm))
+train_data <- data_ibm$close_normalized[1:train_size]
+test_data <- data_ibm$close_normalized[(train_size + 1):nrow(data_ibm)]
+
+# Verificar las dimensiones de los conjuntos de datos
+print(length(train_data))
+print(length(test_data))
+```
+
+.
+
+## Creación de la matriz de entrada y aalida para la red neuronal
+
+```{r}
+# Definir lag como un valor numérico más pequeño
+lag <- 2  # Reducir el lag para asegurar que hay suficientes datos en el conjunto de prueba
+
+# Crear la estructura de entrada y salida para la red neuronal
+create_lagged_matrix <- function(data, lag) {
+  n <- length(data)
+  
+  # Verificar si lag y n son numéricos
+  if (!is.numeric(lag)) {
+    stop("El valor de lag debe ser numérico. Valor actual: ", lag)
+  }
+  if (!is.numeric(n)) {
+    stop("La longitud de los datos debe ser numérica. Valor actual: ", n)
+  }
+  
+  if (n <= lag) {
+    stop("Los datos son insuficientes para crear la matriz con el lag especificado.")
+  }
+  
+  X <- matrix(nrow = (n - lag), ncol = lag)
+  y <- numeric(n - lag)
+  for (i in (lag + 1):n) {
+    X[i - lag, ] <- data[(i - lag):(i - 1)]
+    y[i - lag] <- data[i]
+  }
+  return(list(X = X, y = y))
+}
+
+# Dividir los datos en conjuntos de entrenamiento y prueba
+train_size <- floor(0.8 * nrow(data_ibm))
+train_data <- data_ibm$close_normalized[1:train_size]
+test_data <- data_ibm$close_normalized[(train_size + 1):nrow(data_ibm)]
+
+# Verificar los valores de lag y n
+print(paste("Valor de lag:", lag))
+print(paste("Longitud de train_data:", length(train_data)))
+print(paste("Longitud de test_data:", length(test_data)))
+
+# Crear matrices de entrenamiento y prueba
+train_matrix <- create_lagged_matrix(train_data, lag)
+test_matrix <- create_lagged_matrix(test_data, lag)
+
+# Verificar las dimensiones de las matrices creadas
+print(dim(train_matrix$X))
+print(length(train_matrix$y))
+print(dim(test_matrix$X))
+print(length(test_matrix$y))
+
+```
+
+.
+
+## Entrenamiento del modelo Elman
+
+```{r}
+# Red Elman
+set.seed(123)  # Para reproducibilidad
+elman_model <- elman(train_matrix$X, train_matrix$y, size = c(10, 10), learnFuncParams = c(0.1), maxit = 1000)
+
+# Predicción con el modelo Elman
+elman_predictions <- predict(elman_model, test_matrix$X)
+
+# Verificar las predicciones
+print(head(elman_predictions))
+
+```
+
+.
+
+## Desnormalización y visualización de resultados del modelo Elman
+
+```{r}
+# Desnormalizar las predicciones
+denormalize <- function(x, min_value, max_value) {
+  return(x * (max_value - min_value) + min_value)
+}
+
+elman_predictions_denormalized <- denormalize(elman_predictions, min(data_ibm$close), max(data_ibm$close))
+test_data_denormalized <- denormalize(test_matrix$y, min(data_ibm$close), max(data_ibm$close))
+
+# Visualizar los resultados
+plot(data_ibm$date[(train_size + lag + 1):nrow(data_ibm)], test_data_denormalized, type = "l", col = "blue", lwd = 2, 
+     main = "Predicciones del Modelo Elman", xlab = "Fecha", ylab = "Precio de Cierre")
+lines(data_ibm$date[(train_size + lag + 1):nrow(data_ibm)], elman_predictions_denormalized, col = "red", lwd = 2)
+legend("topright", legend = c("Observado", "Predicción Elman"), col = c("blue", "red"), lwd = 2)
+
+```
+
+Comentarios:
+
+-   Creación de Matrices Laggeadas: Se utilizaron datos laggeados con un lag de 2 para capturar dependencias temporales.
+
+-   Entrenamiento del Modelo Elman: La red Elman se entrenó con dos capas ocultas de 10 neuronas cada una durante 1000 iteraciones.
+
+-   Predicción y Desnormalización: Las predicciones fueron desnormalizadas para compararlas con los valores reales.
+
+-   Visualización de Resultados: La gráfica muestra que el modelo Elman sigue la tendencia de los datos observados, aunque hay diferencias que sugieren áreas de mejora.
+
+-   Análisis Precisión: El modelo sigue razonablemente bien la tendencia, pero la precisión podría mejorar con más datos y ajustes.
+
+-    Limitaciones: La serie temporal es corta y puede no capturar patrones complejos.
+    Usar más datos mejoraría el rendimiento del modelo.
+
+.
+
+.
+
+## Entrenamiento del modelo Jordan
+
+Para implementar una red neuronal Jordan en el análisis de series temporales, realizamos un enfoque similar al utilizado con la red Elman, pero con algunas modificaciones específicas para la arquitectura de la red Jordan.
+Se escribe codigo par realizar:
+
+-   Normalización de los datos de cierre.
+
+-   Dividición los datos en conjuntos de entrenamiento y prueba.
+
+-   Generación de matrices con datos laggeados para la entrada y salida.
+
+-   Definición y entrenamiento de una red neuronal Jordan.
+
+-   Realizar predicciones con el modelo entrenado.
+
+-   Desnormalizar las predicciones.
+
+-   Visualizar las predicciones comparadas con los datos reales.
+
+```{r, echo=TRUE, eval=FALSE}
+# Cargar los paquetes necesarios
+if (!require(RSNNS)) install.packages("RSNNS")
+library(RSNNS)
+
+# Normalizar los datos
+normalize <- function(x) {
+  return((x - min(x)) / (max(x) - min(x)))
+}
+
+# Normalizar la columna de precios de cierre
+data_ibm$close_normalized <- normalize(data_ibm$close)
+
+# Dividir los datos en conjuntos de entrenamiento y prueba
+train_size <- floor(0.8 * nrow(data_ibm))
+train_data <- data_ibm$close_normalized[1:train_size]
+test_data <- data_ibm$close_normalized[(train_size + 1):nrow(data_ibm)]
+
+# Crear la estructura de entrada y salida para la red neuronal
+create_lagged_matrix <- function(data, lag) {
+  n <- length(data)
+  if (n <= lag) {
+    stop("Los datos son insuficientes para crear la matriz con el lag especificado.")
+  }
+  X <- matrix(nrow = (n - lag), ncol = lag)
+  y <- numeric(n - lag)
+  for (i in (lag + 1):n) {
+    X[i - lag, ] <- data[(i - lag):(i - 1)]
+    y[i - lag] <- data[i]
+  }
+  return(list(X = X, y = y))
+}
+
+# Verificar los valores de lag y n
+lag <- 2
+print(paste("Valor de lag:", lag))
+print(paste("Longitud de train_data:", length(train_data)))
+print(paste("Longitud de test_data:", length(test_data)))
+
+# Crear matrices de entrenamiento y prueba
+train_matrix <- create_lagged_matrix(train_data, lag)
+test_matrix <- create_lagged_matrix(test_data, lag)
+
+# Verificar las dimensiones de las matrices creadas
+print(dim(train_matrix$X))
+print(length(train_matrix$y))
+print(dim(test_matrix$X))
+print(length(test_matrix$y))
+
+# Red Jordan
+set.seed(123)  # Para reproducibilidad
+jordan_model <- jordan(train_matrix$X, train_matrix$y, size = c(10, 10), learnFuncParams = c(0.1), maxit = 1000)
+
+# Predicción con el modelo Jordan
+jordan_predictions <- predict(jordan_model, test_matrix$X)
+
+# Desnormalizar las predicciones
+denormalize <- function(x, min_value, max_value) {
+  return(x * (max_value - min_value) + min_value)
+}
+
+jordan_predictions_denormalized <- denormalize(jordan_predictions, min(data_ibm$close), max(data_ibm$close))
+test_data_denormalized <- denormalize(test_matrix$y, min(data_ibm$close), max(data_ibm$close))
+
+# Visualizar los resultados
+plot(data_ibm$date[(train_size + lag + 1):nrow(data_ibm)], test_data_denormalized, type = "l", col = "blue", lwd = 2, 
+     main = "Predicciones del Modelo Jordan", xlab = "Fecha", ylab = "Precio de Cierre")
+lines(data_ibm$date[(train_size + lag + 1):nrow(data_ibm)], jordan_predictions_denormalized, col = "red", lwd = 2)
+legend("topright", legend = c("Observado", "Predicción Jordan"), col = c("blue", "red"), lwd = 2)
+
+```
+
+***Processing file: Redes_neuronales.Rmd [unnamed-chunk-7]terminate called after throwing an instance of 'Rcpp::not_compatible' what(): Expecting a single value: [extent=2].***
+
+A pesar de seguir todos los pasos necesarios para la implementación de una red neuronal Jordan en el análisis de series temporales, incluyendo la normalización de los datos, la división en conjuntos de entrenamiento y prueba, la generación de matrices laggeadas, y la configuración y entrenamiento del modelo, no fue posible ejecutar el modelo correctamente debido a un error persistente.
+Específicamente, el error "Expecting a single value: [extent=2]" del paquete RSNNS indica problemas de compatibilidad con la estructura de los datos o la configuración del modelo en el entorno R utilizado.
+
+Este error persistió incluso después de varios intentos de depuración y ajuste del código, así como de probar diferentes paquetes y enfoques.
+Se intentó también usar otros paquetes como keras para la implementación del modelo Jordan, pero igualmente se encontraron problemas de compatibilidad y ejecución.
+La limitación principal se relaciona con la sensibilidad del paquete RSNNS y otros paquetes probados a la estructura de los datos y la cantidad insuficiente de datos para entrenar adecuadamente un modelo Jordan.
+Por lo tanto, se concluye que la implementación del modelo Jordan no es factible con las herramientas y datos disponibles en el entorno actual.

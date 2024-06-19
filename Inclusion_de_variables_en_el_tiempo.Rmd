@@ -191,3 +191,4 @@ legend("topright", legend = c("Observado", "Predicción"), col = c("blue", "red"
 **Diagnóstico del Modelo**
 
 Los residuos del modelo parecen razonables, con una distribución que no muestra patrones claros de no linealidad ni heterocedasticidad (variación no constante de los errores).
+.

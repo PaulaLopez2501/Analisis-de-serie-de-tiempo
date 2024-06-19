@@ -6,180 +6,72 @@ editor_options:
 
 # Comentarios
 
-A lo largo de este análisis, hemos seguido varios pasos para trabajar
-con series temporales. Aquí están comentarios derivados de nuestro
-análisis antes de pasar a la conclusion:
+-   **Modelo ARIMA**: identificado ARIMA(0,0,0) con media cero indica
+    que los datos del índice Dow Jones se comportan como ruido blanco,
+    es decir, no presentan patrones significativos para predecir. Esto
+    implica que los precios no muestran dependencias temporales claras
+    ni estructuras predecibles, limitando la utilidad del modelo para
+    pronósticos precisos en el contexto de datos bursátiles​.
 
-## Preprocesamiento de datos
+-   **Modelo Holt-Winters**: aplicado sin componente estacional debido a
+    la longitud de la serie, proporcionó un ajuste adecuado a los datos
+    históricos. Los parámetros de suavizado mostraron una capacidad
+    razonable para capturar la tendencia observada y sus predicciones a
+    corto plazo fueron consistentes. Sin embargo, para predicciones a
+    largo plazo, su capacidad se ve limitada, especialmente sin un
+    componente estacional claro en los datos​
 
--   **Carga y limpieza:** Se cargaron los datos, se verificaron valores
-    faltantes (NA), se aplicaron métodos para imputar datos faltantes si
-    era necesario, se selecciono una solo stock para todo el analisis.
+-   **Modelo Facebook's Prophet**: demostró ser efectivo al identificar
+    patrones semanales claros en los precios del índice Dow Jones,
+    reflejando variaciones específicas a lo largo de la semana. Su
+    capacidad para manejar datos con faltantes y cambios en las
+    tendencias lo hace particularmente útil. Las predicciones mostraron
+    una tendencia a la baja, con intervalos de confianza amplios que
+    indican una creciente incertidumbre, característica esencial en
+    mercados financieros​
 
--   **Formateo de fechas:** Se aseguró que las fechas estuvieran en el
-    formato correcto y se organizó el dataset por fecha para garantizar
-    una secuencia temporal adecuada.
+-   **Redes Neuronales**: Se utilizaron modelos de redes neuronales como
+    Elman y Jordan. Aunque estos modelos son potentes para capturar
+    relaciones no lineales en los datos, su aplicación requiere una
+    cantidad significativa de datos y procesamiento. En este caso, la
+    serie temporal limitada, corta en datos podría haber afectado su
+    rendimiento y precisión en la predicción. Sin embargo, las redes
+    neuronales siguen siendo una opción válida para series temporales
+    más extensas y complejas​ .
 
--   **Visualización de la serie temporal:** Se realizaron gráficos para
-    visualizar el comportamiento de las variables, identificando
-    posibles tendencias y patrones.
+.
 
-## Creacion de serie temporal
+# Conclusión
 
--   **Frecuencia de la serie temporal**: se calculó la diferencia entre
-    fechas en la serie temporal. El análisis mostró que la mayoría de
-    los intervalos entre fechas era de 7 días, lo que sugiere una
-    frecuencia semanal. Este dato fue utilizado para establecer una
-    frecuencia de 52 semanas por año al crear la serie temporal.
+En el contexto de los datos bursátiles del índice Dow Jones, se
+recomienda el uso del modelo ***Facebook's Prophet.*** Este modelo se
+destacó por su capacidad para identificar y manejar patrones semanales
+específicos en los precios del índice Dow Jones. Durante el análisis,
+***Prophet*** logró captar variaciones claras a lo largo de la semana,
+mostrando que los precios tienden a ser más bajos al inicio de la semana
+y alcanzan su punto máximo a mitad de semana. Esta característica es
+crucial para los analistas bursátiles, ya que permite anticipar
+comportamientos recurrentes del mercado.
 
--   **Construcción de la serie temporal**: Con base en la frecuencia
-    identificada, se creó una serie temporal utilizando la columna
-    'close' y la fecha de inicio correspondiente. El resultado fue una
-    serie temporal con datos semanales, proporcionando la base para el
-    análisis posterior.
+Además, ***Prophet*** fue capaz de manejar los datos con faltantes y
+adaptarse a cambios abruptos en las tendencias, lo que lo hace
+particularmente adecuado para el entorno volátil de los mercados
+financieros. Las predicciones generadas por ***Prophet*** indicaron una
+continuación de la tendencia a la baja, con intervalos de confianza
+amplios que reflejan la creciente incertidumbre en las predicciones
+futuras. Esta capacidad de proporcionar intervalos de confianza es
+esencial para evaluar el riesgo y tomar decisiones informadas en el
+mercado de valores.
 
-## Estructura de datos en series temporales
+En comparación, otros modelos como ARIMA no mostraron una estructura
+significativa en los datos, y el modelo Holt-Winters, aunque adecuado
+para datos históricos, tuvo limitaciones en las predicciones a largo
+plazo. Las redes neuronales, por su parte, requieren una mayor cantidad
+de datos y procesamiento, lo que las hace menos prácticas para esta
+serie temporal específica.
 
--   **Promedio móvil**: Se utilizó un promedio móvil simple con una
-    ventana de 3 períodos para suavizar las fluctuaciones a corto plazo
-    y revelar tendencias a largo plazo. El gráfico del promedio móvil
-    mostró cómo el suavizado ayuda a visualizar la tendencia en la serie
-    temporal, permitiendo identificar patrones generales.
-
--   **Rezagos y correlación**: Se exploró el uso de rezagos para
-    identificar relaciones entre valores anteriores y actuales. La
-    correlación entre el precio actual y el rezago de 1 período fue de
-    0.8706391, indicando una fuerte relación positiva. Esto sugiere que
-    los valores anteriores tienen un impacto significativo en los
-    valores posteriores, lo cual puede ser útil para la predicción.
-
--   **Estacionalidad y descomposición**: Se intentó usar la función
-    **`decompose`** para detectar estacionalidad, pero la serie temporal
-    era demasiado corta para un ciclo completo, lo que resultó en un
-    error. Esto implica que no fue posible identificar estacionalidad
-    con la serie temporal existente.
-
--   **Estacionariedad y descomposicion, prueba de Dickey-Fuller:** Esta
-    prueba mostró que la serie temporal original no era estacionaria
-    (p-valor \> 0.05), lo que indica que había una tendencia o raíz
-    unitaria.
-
--   **Diferenciación y transformación logarítmica:** Se aplicaron estas
-    técnicas para estabilizar la serie temporal y eliminar la tendencia.
-    Sin embargo, incluso después de estas transformaciones, la prueba de
-    Dickey-Fuller seguía mostrando no estacionariedad.
-
-## Análisis de modelo ARIMA
-
--   **Identificación del mejor modelo ARIMA:** Se utilizó auto.arima()
-    para identificar el modelo ARIMA más adecuado para la serie
-    temporal. El resultado fue ARIMA(0,0,0) con media cero, un modelo de
-    ruido blanco.
-
--   **Diagnóstico del modelo ARIMA:** El test de Ljung-Box mostró que
-    los residuos del modelo ARIMA(0,0,0) con media cero eran
-    consistentes con ruido blanco, lo que indica que no había
-    autocorrelaciones significativas.
-
--   **Pronóstico con modelo ARIMA:** El pronóstico para 10 períodos
-    futuros con este modelo reflejó la naturaleza de ruido blanco de la
-    serie temporal, mostrando valores sin un patrón claro o predecible.
-
-## Modelo Holt-Winters
-
--   **Modelo Holt-Winters sin componente estacional:** El modelo ajusta
-    bien los datos históricos, mostrando que los valores ajustados
-    siguen la tendencia observada.
-
--   **Parámetros de Suavizado:** Los parámetros alpha y beta son
-    fundamentales para modelar la evolución temporal de los datos.
-
--   **Diagnóstico de Residuos:** La prueba de Ljung-Box mostró un
-    p-valor alto (0.8316), indicando que los residuos no tienen
-    autocorrelación significativa, validando la captura de variabilidad
-    por parte del modelo.
-
--   **Pronóstico:** Las predicciones a 10 períodos ofrecen una visión
-    del comportamiento futuro de los precios de cierre de IBM, basado en
-    el patrón histórico.
-
--   **SSE (Sum of Squared Errors):** Un SSE bajo indica que el modelo
-    Holt-Winters ajustado correctamente captura la variabilidad de los
-    datos observados. .
-
-## Modelo Facebook's Prophet
-
--   **Predicción a Futuro:** El modelo proyecta una continuación de la
-    tendencia a la baja con un intervalo de confianza que se amplía a
-    medida que avanza el tiempo, lo que refleja la creciente
-    incertidumbre en las predicciones futuras.
-
--   **Patrón Semanal:** Hay un patrón claro de variación en los precios
-    a lo largo de la semana. Los precios tienden a ser más bajos al
-    inicio de la semana (domingo, lunes y martes), alcanzan su punto más
-    alto a mitad de semana (miércoles, jueves y viernes), y vuelven a
-    bajar hacia el fin de semana (sábado).
-
--   **Implicaciones:** Este patrón sugiere que hay ciertos días de la
-    semana donde la actividad en el mercado o las decisiones de
-    inversión tienen un impacto mayor en los precios. Esto puede ser
-    útil para los traders que buscan optimizar sus estrategias de
-    entrada y salida.
-
--   **Ajustes del Modelo:** unque el modelo Prophet ha capturado la
-    tendencia general y la estacionalidad semanal, sería beneficioso
-    incluir más datos históricos y considerar otros factores externos,
-    como eventos macroeconómicos o cambios en la empresa IBM, para
-    mejorar la precisión del modelo.
-
--   **Estrategias de Trading:** Los traders pueden considerar la
-    estacionalidad semanal al planificar sus estrategias de compra y
-    venta. Por ejemplo, podrían optar por vender en los días con precios
-    más altos y comprar en los días con precios más bajos.
-
-## Redes Neuronales modelo Elman
-
--   **Creación de Matrices Laggeadas**: Se utilizaron datos laggeados
-    con un lag de 2 para capturar dependencias temporales.
-
--   **Entrenamiento del Modelo Elman:** La red Elman se entrenó con dos
-    capas ocultas de 10 neuronas cada una durante 1000 iteraciones.
-
--   **Predicción y Desnormalización:** Las predicciones fueron
-    desnormalizadas para compararlas con los valores reales.
-
--   **Visualización de Resultados:** La gráfica muestra que el modelo
-    Elman sigue la tendencia de los datos observados, aunque hay
-    diferencias que sugieren áreas de mejora.
-
--   **Análisis Precisión:** El modelo sigue razonablemente bien la
-    tendencia, pero la precisión podría mejorar con más datos y ajustes.
-
--    **Limitaciones:** La serie temporal es corta y puede no capturar
-    patrones complejos. Usar más datos mejoraría el rendimiento del
-    modelo.
-
-## Redes Neuronales modelo Jordan
-
-A pesar de seguir todos los pasos necesarios para la implementación de
-una red neuronal Jordan en el análisis de series temporales, incluyendo
-la normalización de los datos, la división en conjuntos de entrenamiento
-y prueba, la generación de matrices laggeadas, y la configuración y
-entrenamiento del modelo, no fue posible ejecutar el modelo
-correctamente debido a un error persistente. Específicamente, el error
-"Expecting a single value: [extent=2]" del paquete RSNNS indica
-problemas de compatibilidad con la estructura de los datos o la
-configuración del modelo en el entorno R utilizado.
-
-Este error persistió incluso después de varios intentos de depuración y
-ajuste del código, así como de probar diferentes paquetes y enfoques. Se
-intentó también usar otros paquetes como keras para la implementación
-del modelo Jordan, pero igualmente se encontraron problemas de
-compatibilidad y ejecución. La limitación principal se relaciona con la
-sensibilidad del paquete RSNNS y otros paquetes probados a la estructura
-de los datos y la cantidad insuficiente de datos para entrenar
-adecuadamente un modelo Jordan. Por lo tanto, se concluye que la
-implementación del modelo Jordan no es factible con las herramientas y
-datos disponibles en el entorno actual.
-
-# Conclusion
+Por lo tanto, ***Facebook's Prophet*** es el modelo más adecuado para el
+análisis y predicción de series temporales en el contexto de los datos
+bursátiles del índice Dow Jones debido a su adaptabilidad, manejo de
+estacionalidad y capacidad para proporcionar predicciones con intervalos
+de confianza​

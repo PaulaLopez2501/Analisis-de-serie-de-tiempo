@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Analisis de Dow Jone Index para materia Analisis de series de tiempo</title>
-  <meta name="description" content="Analisis de Dow Jone Index para materia Analisis de series de tiempo" />
+  <title>11 Comentarios y conclusión | Analisis de Dow Jone Index para materia Analisis de series de tiempo</title>
+  <meta name="description" content="11 Comentarios y conclusión | Analisis de Dow Jone Index para materia Analisis de series de tiempo" />
   <meta name="generator" content="bookdown 0.39 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Analisis de Dow Jone Index para materia Analisis de series de tiempo" />
+  <meta property="og:title" content="11 Comentarios y conclusión | Analisis de Dow Jone Index para materia Analisis de series de tiempo" />
   <meta property="og:type" content="book" />
   
   
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Analisis de Dow Jone Index para materia Analisis de series de tiempo" />
+  <meta name="twitter:title" content="11 Comentarios y conclusión | Analisis de Dow Jone Index para materia Analisis de series de tiempo" />
   
   
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
+<link rel="prev" href="redes-neuronales.html"/>
 
-<link rel="next" href="exploracion-de-datos-eda.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -204,35 +204,85 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="header">
-<h1 class="title">Analisis de Dow Jone Index para materia Analisis de series de tiempo</h1>
-<p class="author"><em>Paula López</em></p>
-<p class="date"><em>2024-05-01</em></p>
-</div>
-<div id="introducción" class="section level1 hasAnchor" number="1">
-<h1><span class="header-section-number">1</span> Introducción<a href="index.html#introducción" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p>Para el desarollo de esta actividad se elije los datos: <strong>Dow Jones Index</strong></p>
-<p>Justificación: El índice Dow Jones es uno de los indicadores bursátiles más reconocidos y utilizados para medir el rendimiento de las acciones de grandes empresas estadounidenses. información sobre 30 compañías que forman parte de este índice, incluyendo precios de apertura y cierre, volumen de transacciones, precios máximos y mínimos, entre otros. Trabajar con estos datos a lo largo del curso nos permitirá desarrollar habilidades analíticas y comprender mejor la dinámica de los mercados financieros, una de las ramas donde mas se buscan a científicos de datos.</p>
-<p>Fuente: La base de datos que utilizaremos proviene del UCI Machine Learning Repository, que ofrece acceso público a datos con fines académicos y de investigación. No hay restricciones para su uso.</p>
-<p><a href="https://archive.ics.uci.edu/dataset/312/dow+jones+index" class="uri"><em>https://archive.ics.uci.edu/dataset/312/dow+jones+index</em></a></p>
-<p>Característica de los datos:</p>
-<ul>
-<li><p>Tipo: Time-Series</p></li>
-<li><p>Tareas asociadas: Classification, Clustering</p></li>
-<li><p>N Instancias: 750</p></li>
-<li><p>N Caracteres: 15</p></li>
-</ul>
-<p>Fecha de creacion de data set: 10/22/2014</p>
+<div id="comentarios-y-conclusión" class="section level1 hasAnchor" number="11">
+<h1><span class="header-section-number">11</span> Comentarios y conclusión<a href="comentarios-y-conclusión.html#comentarios-y-conclusión" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>.</p>
+<div id="comentarios" class="section level2 hasAnchor" number="11.1">
+<h2><span class="header-section-number">11.1</span> Comentarios<a href="comentarios-y-conclusión.html#comentarios" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<ul>
+<li><p><strong>Modelo ARIMA</strong>: identificado ARIMA(0,0,0) con media cero indica
+que los datos del índice Dow Jones se comportan como ruido blanco,
+es decir, no presentan patrones significativos para predecir. Esto
+implica que los precios no muestran dependencias temporales claras
+ni estructuras predecibles, limitando la utilidad del modelo para
+pronósticos precisos en el contexto de datos bursátiles​.</p></li>
+<li><p><strong>Modelo Holt-Winters</strong>: aplicado sin componente estacional debido a
+la longitud de la serie, proporcionó un ajuste adecuado a los datos
+históricos. Los parámetros de suavizado mostraron una capacidad
+razonable para capturar la tendencia observada y sus predicciones a
+corto plazo fueron consistentes. Sin embargo, para predicciones a
+largo plazo, su capacidad se ve limitada, especialmente sin un
+componente estacional claro en los datos​</p></li>
+<li><p><strong>Modelo Facebook’s Prophet</strong>: demostró ser efectivo al identificar
+patrones semanales claros en los precios del índice Dow Jones,
+reflejando variaciones específicas a lo largo de la semana. Su
+capacidad para manejar datos con faltantes y cambios en las
+tendencias lo hace particularmente útil. Las predicciones mostraron
+una tendencia a la baja, con intervalos de confianza amplios que
+indican una creciente incertidumbre, característica esencial en
+mercados financieros​</p></li>
+<li><p><strong>Redes Neuronales</strong>: Se utilizaron modelos de redes neuronales como
+Elman y Jordan. Aunque estos modelos son potentes para capturar
+relaciones no lineales en los datos, su aplicación requiere una
+cantidad significativa de datos y procesamiento. En este caso, la
+serie temporal limitada, corta en datos podría haber afectado su
+rendimiento y precisión en la predicción. Sin embargo, las redes
+neuronales siguen siendo una opción válida para series temporales
+más extensas y complejas​ .</p></li>
+</ul>
+<p>.</p>
+</div>
+<div id="conclusión" class="section level2 hasAnchor" number="11.2">
+<h2><span class="header-section-number">11.2</span> Conclusión<a href="comentarios-y-conclusión.html#conclusión" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>En el contexto de los datos bursátiles del índice Dow Jones, se
+recomienda el uso del modelo <strong><em>Facebook’s Prophet.</em></strong> Este modelo se
+destacó por su capacidad para identificar y manejar patrones semanales
+específicos en los precios del índice Dow Jones. Durante el análisis,
+<strong><em>Prophet</em></strong> logró captar variaciones claras a lo largo de la semana,
+mostrando que los precios tienden a ser más bajos al inicio de la semana
+y alcanzan su punto máximo a mitad de semana. Esta característica es
+crucial para los analistas bursátiles, ya que permite anticipar
+comportamientos recurrentes del mercado.</p>
+<p>Además, <strong><em>Prophet</em></strong> fue capaz de manejar los datos con faltantes y
+adaptarse a cambios abruptos en las tendencias, lo que lo hace
+particularmente adecuado para el entorno volátil de los mercados
+financieros. Las predicciones generadas por <strong><em>Prophet</em></strong> indicaron una
+continuación de la tendencia a la baja, con intervalos de confianza
+amplios que reflejan la creciente incertidumbre en las predicciones
+futuras. Esta capacidad de proporcionar intervalos de confianza es
+esencial para evaluar el riesgo y tomar decisiones informadas en el
+mercado de valores.</p>
+<p>En comparación, otros modelos como ARIMA no mostraron una estructura
+significativa en los datos, y el modelo Holt-Winters, aunque adecuado
+para datos históricos, tuvo limitaciones en las predicciones a largo
+plazo. Las redes neuronales, por su parte, requieren una mayor cantidad
+de datos y procesamiento, lo que las hace menos prácticas para esta
+serie temporal específica.</p>
+<p>Por lo tanto, <strong><em>Facebook’s Prophet</em></strong> es el modelo más adecuado para el
+análisis y predicción de series temporales en el contexto de los datos
+bursátiles del índice Dow Jones debido a su adaptabilidad, manejo de
+estacionalidad y capacidad para proporcionar predicciones con intervalos
+de confianza​</p>
 
+</div>
 </div>
             </section>
 
           </div>
         </div>
       </div>
+<a href="redes-neuronales.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
 
-<a href="exploracion-de-datos-eda.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

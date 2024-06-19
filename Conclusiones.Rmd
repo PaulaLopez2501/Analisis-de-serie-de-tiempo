@@ -4,7 +4,11 @@ editor_options:
     wrap: 72
 ---
 
-# Comentarios
+# Comentarios y conclusión
+
+.
+
+## Comentarios
 
 -   **Modelo ARIMA**: identificado ARIMA(0,0,0) con media cero indica
     que los datos del índice Dow Jones se comportan como ruido blanco,
@@ -41,7 +45,7 @@ editor_options:
 
 .
 
-# Conclusión
+## Conclusión
 
 En el contexto de los datos bursátiles del índice Dow Jones, se
 recomienda el uso del modelo ***Facebook's Prophet.*** Este modelo se
